@@ -1,3 +1,4 @@
+// leaving a test
 // Select the search button and input field
 const searchButton = document.querySelector('.search-button');
 const searchInput = document.querySelector('.search-input');
