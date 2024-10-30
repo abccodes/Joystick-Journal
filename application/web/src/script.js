@@ -1,42 +1,45 @@
-// Select the search button and input field
 const searchButton = document.querySelector('.search-button')
 const searchInput = document.querySelector('.search-input')
 const gameGrid = document.getElementById('gameGrid')
+const genreFilter = document.getElementById('genre-filter')
+const ratingFilter = document.getElementById('rating-filter')
 
 // Add an event listener to the search button
 searchButton.addEventListener('click', async () => {
-  const searchTerm = searchInput.value // Get the input value
+  const searchTerm = searchInput.value
+  const selectedGenre = genreFilter.value
+  const selectedRating = ratingFilter.value
 
-  // Check if the input is not empty
   if (searchTerm) {
     try {
-      // Make a fetch request to the backend on EC2
-      const response = await fetch(
-        `http://54.200.162.255/api/games/search?query=${encodeURIComponent(
-          searchTerm,
-        )}`,
-      )
+      // Update API URL with genre and rating filters
+      const queryParams = new URLSearchParams({
+        query: searchTerm,
+        genre: selectedGenre || undefined,
+        rating: selectedRating || undefined,
+      })
+
+      const response = await fetch(`http://54.200.162.255/api/games/search?${queryParams}`)
 
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
-      const games = await response.json() // Parse the JSON response
+      
+      const games = await response.json()
 
       console.log('Fetched games:', games)
-      // Clear the previous game tiles
       gameGrid.innerHTML = ''
 
-      // Populate the grid with fetched games
       games.forEach((game) => {
         const gameTile = document.createElement('div')
         gameTile.className = 'game-tile'
-        gameTile.textContent = game.title // Assuming each game object has a 'title' property
+        gameTile.textContent = game.title
         gameGrid.appendChild(gameTile)
       })
     } catch (error) {
       console.error('Error fetching games:', error)
     }
   } else {
-    alert('Please enter a search term') // Alert if input is empty
+    alert('Please enter a search term')
   }
 })

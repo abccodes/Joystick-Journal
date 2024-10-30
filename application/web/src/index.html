@@ -9,7 +9,6 @@
   <body>
     <header class="banner">
       <div class="banner-picture"></div>
-      <!-- New div for the background image -->
       <div class="banner-content">
         <h1 class="title">Rate My Video Game</h1>
         <div class="buttons">
@@ -31,12 +30,29 @@
         </div>
         <button class="search-button">Search</button>
       </div>
-      <div class="buttons">
-        <label> Filter By: </label>
-        <button class="pill-button">Rating</button>
+      
+      <!-- Filter Options for Genre and Rating -->
+      <div class="filter-options">
+        <label for="genre-filter">Genre:</label>
+        <select id="genre-filter" class="filter-dropdown">
+          <option value="">All Genres</option>
+          <option value="Action">Action</option>
+          <option value="Adventure">Adventure</option>
+          <option value="RPG">RPG</option>
+          <!-- Add more genre options as needed -->
+        </select>
+
+        <label for="rating-filter">Rating:</label>
+        <select id="rating-filter" class="filter-dropdown">
+          <option value="">All Ratings</option>
+          <option value="E">E (Everyone)</option>
+          <option value="T">T (Teen)</option>
+          <option value="M">M (Mature)</option>
+          <!-- Add more rating options as needed -->
+        </select>
       </div>
+
       <div class="grid" id="gameGrid">
-        <!-- jason added this for js-->
         <div class="game-tile"></div>
         <div class="game-tile"></div>
         <div class="game-tile"></div>
@@ -54,6 +70,5 @@
     </section>
 
     <script src="script.js"></script>
-    <!-- jason added this for js -->
   </body>
 </html>
