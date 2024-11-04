@@ -74,12 +74,18 @@ document.addEventListener('DOMContentLoaded', () => {
           console.log('Fetched games:', games)
 
           gameGrid.innerHTML = ''
-          games.forEach((game) => {
-            const gameTile = document.createElement('div')
-            gameTile.className = 'game-tile'
-            gameTile.textContent = game.title
-            gameGrid.appendChild(gameTile)
-          })
+
+          //check if games array is empty and display a message
+          if (games.length === 0) {
+            gameGrid.innerHTML = '<p>No games found matching your search criteria.</p>';
+          } else {
+            games.forEach((game) => {
+              const gameTile = document.createElement('div')
+              gameTile.className = 'game-tile'
+              gameTile.textContent = game.title
+              gameGrid.appendChild(gameTile)
+            })
+          }
         } catch (error) {
           console.error('Error fetching games:', error)
         }
