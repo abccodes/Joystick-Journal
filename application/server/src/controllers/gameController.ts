@@ -28,11 +28,14 @@ export const searchGames = async (
 ): Promise<void> => {
   try {
     const { query, genre, review_rating } = req.query;
+    console.log("Recieved parameters", { query, genre, review_rating});
     const games = await gameModel.findGames(
       query as string,
       genre as string,
       Number(review_rating)
     );
+
+    console.log("Games retrieved from database:", games); // Log the retrieved games
 
     if (!games.length) {
       res.status(404).json({ message: "No games found" });

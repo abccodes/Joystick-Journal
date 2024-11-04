@@ -30,35 +30,42 @@ class Game {
     const pool = getPool();
     let sql = "SELECT * FROM games WHERE 1=1";
     const values: (string | number)[] = [];
-
+  
     console.log(
       `Searching games with query: "${query}", genres: "${genres}", minimum review rating: ${minReviewRating}`
     );
-
+  
     // Title search
     if (query) {
       sql += " AND title LIKE ?";
       values.push(`%${query}%`);
     }
-
+  
     // Genre filtering with partial matching
     if (genres) {
       const genreList = genres.split(",").map((g) => g.trim());
       sql += " AND (" + genreList.map(() => "genre LIKE ?").join(" OR ") + ")";
       values.push(...genreList.map((genre) => `%${genre}%`));
     }
-
+  
     // Minimum review rating
-    if (minReviewRating) {
+    if (minReviewRating > 0) {
       sql += " AND review_rating >= ?";
       values.push(minReviewRating);
     }
-
+  
     console.log(`Final SQL Query: ${sql} with values:`, values);
-
-    const [rows] = await pool.query(sql, values);
-    return rows as GameInterface[];
+  
+    try {
+      const [rows] = await pool.query(sql, values);
+      console.log("Rows returned by query:", rows); // This should execute if query runs successfully
+      return rows as GameInterface[];
+    } catch (error) {
+      console.error("Error executing query in findGames:", error);
+      return []; // Return an empty array to handle gracefully if an error occurs
+    }
   };
+  
 
   deleteGame = async (gameId: number): Promise<void> => {
     const sql = "DELETE FROM games WHERE game_id = ?";
