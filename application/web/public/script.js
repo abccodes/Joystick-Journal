@@ -49,23 +49,25 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
+
   // Search functionality
   const searchButton = document.querySelector('.search-button')
   const searchInput = document.querySelector('.search-input')
   const gameGrid = document.getElementById('gameGrid')
+
   if (searchButton && searchInput && gameGrid) {
     searchButton.addEventListener('click', async () => {
       const searchTerm = searchInput.value
-      const reviewRating = Number(req.query.review_rating) || 0;
-      const genre = ""
+      const genre = ""; // Default empty genre
+      const reviewRating = 0; // Default rating
 
       if (searchTerm) {
         try {
           const response = await fetch(
-            `http://localhost:8000/api/games/search?query=${encodeURIComponent(
-              searchTerm,
-            )}`,
-          )
+          `http://localhost:8000/api/games/search?query=${encodeURIComponent(searchTerm)}&genre=${encodeURIComponent(genre)}&review_rating=${reviewRating}`
+    
+            );
+          
           if (!response.ok) throw new Error('Network response was not ok')
 
           const games = await response.json()
