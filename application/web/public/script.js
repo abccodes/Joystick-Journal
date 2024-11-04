@@ -56,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (searchButton && searchInput && gameGrid) {
     searchButton.addEventListener('click', async () => {
       const searchTerm = searchInput.value
+      const reviewRating = Number(req.query.review_rating) || 0;
+      const genre = ""
 
       if (searchTerm) {
         try {
