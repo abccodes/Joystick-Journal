@@ -420,3 +420,137 @@ footer {
     width: 100%; 
     padding-left: 20px;
 }
+
+.profile-picture-container {
+    position: absolute;
+    top: 160px;
+    right: 50px;
+    width: 90px;
+    height: 90px;
+    border-radius: 70%; /* Keeps the bubble style */
+    overflow: hidden;
+    cursor: pointer; /* Indicates it's clickable */
+    border: 2px solid #fff; /* White border around the bubble */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Adds shadow for depth */
+}
+
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* Profile Container */
+.profile-container {
+    background-color: #fff;
+    padding: 20px 40px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: auto;
+}
+
+
+
+/* Header with Edit Button */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3e2e2f;
+}
+
+.edit-profile-button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-size: 14px;
+    color: #3e2e2f;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Space between text and icon */
+    
+}
+
+.edit-profile-button::before {
+    content: "\270E"; /* Pencil icon in Unicode */
+    font-size: 14px;
+    margin-left: 10px
+}
+
+
+/* Tabs */
+.tabs {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid #ddd;
+    margin-top: 20px;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: transparent;
+    font-weight: bold;
+    color: #3e2e2f;
+    border: none;
+}
+
+.tab.active {
+    border-bottom: 3px solid #3e2e2f;
+}
+
+
+/* Profile Content Grid */
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    color: #3e2e2f;
+}
+
+.profile-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-section h2 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: normal;
+    color: #3e2e2f;
+}
+
+.profile-section p {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Reviews Section */
+.reviews-section {
+    margin-top: 40px;
+    padding: 20px 0;
+    color: #3e2e2f;
+    font-weight: bold;
+    text-align: left;
+    border-top: 1px solid #ddd;
+}
+
+
+
+
+
+
+
+

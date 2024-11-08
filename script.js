@@ -1,3 +1,25 @@
+document.addEventListener("DOMContentLoaded", function() {
+    // Select the profile picture elements
+    const profilePicUpload = document.getElementById('profilePicUpload');
+    const profilePic = document.getElementById('profilePic');
+
+    // Only add the event listener if the elements exist
+    if (profilePicUpload && profilePic) {
+        profilePicUpload.addEventListener('change', function(event) {
+            console.log("File selected"); // Add this to verify event trigger
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    console.log("Image loaded"); // Add this to verify loading
+                    profilePic.src = e.target.result; // Set the profile picture src to the uploaded image's data URL
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
 // Select the search button, input field, rating filter, and game grid
 const searchButton = document.querySelector('.search-button');
 const searchInput = document.querySelector('.search-input');
@@ -42,4 +64,3 @@ searchButton.addEventListener('click', async () => {
         alert('Please enter a search term'); // Alert if input is empty
     }
 });
-
