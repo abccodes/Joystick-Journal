@@ -92,4 +92,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   
 
   await checkAuthStatus();
+
+
+  // Game Review
+  const reviewInput = document.querySelector('.review-input');
+  const postReviewButton = document.querySelector('.post-review');
+  const starRatingContainer = document.querySelector('.star-rating');
+  const gameTitleElement = document.getElementById('game-title');
+  const reviewsContainer = document.createElement('div'); 
+  reviewsContainer.classList.add('reviews-list');
+  starRatingContainer.parentElement.appendChild(reviewsContainer); 
+
+  const gameId = new URLSearchParams(window.location.search).get('gameId'); 
+  let selectedRating = 0;
+
+  // Highlight stars on click
+  if (starRatingContainer) {
+    starRatingContainer.addEventListener('click', event => {
+      if (event.target.classList.contains('star')) {
+        selectedRating = parseInt(event.target.dataset.value, 10);
+        Array.from(starRatingContainer.children).forEach(star => {
+          const starValue = parseInt(star.dataset.value, 10);
+          star.style.color = starValue <= selectedRating ? 'gold' : 'gray';
+        });
+      }
+    });
+  }
+
+
 });
