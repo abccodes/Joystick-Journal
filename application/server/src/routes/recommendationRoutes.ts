@@ -4,11 +4,16 @@ import {
   fetchUserData,
   generateGameEmbeddingsWithPCA,
 } from '../controllers/recommendationController';
+import { authenticate } from '../middleware/authMiddleware';
 
 const router = Router();
 
 router.get('/fetchGames', fetchGamesData);
 router.get('/fetchUser/:id', fetchUserData);
-router.get('/generateEmbeddingsWithPCA', generateGameEmbeddingsWithPCA);
+router.get(
+  '/generateEmbeddingsWithPCA',
+  authenticate,
+  generateGameEmbeddingsWithPCA
+);
 
 export default router;

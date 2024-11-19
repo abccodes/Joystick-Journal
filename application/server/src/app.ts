@@ -31,7 +31,6 @@ app.use(
 );
 
 app.use(cookieParser());
-
 app.use(helmet());
 
 const allowedOrigins = [
@@ -85,13 +84,13 @@ passport.deserializeUser((obj: any, done) => {
 
 connectUserDB();
 
+app.use(errorHandler);
+
 app.use('/api/auth', authRouter);
 app.use('/api/users', authenticate, userRouter);
 app.use('/api/games', gameRouter);
 app.use('/api/userdata', userDataRouter);
 app.use('/api/reviews', reviewRoter);
-app.use('/api/recommendations', recommendationRouter);
-
-app.use(errorHandler);
+app.use('/api/recommendations', authenticate, recommendationRouter);
 
 export default app;

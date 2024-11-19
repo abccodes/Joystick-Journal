@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import ReviewModel from "../models/ReviewModel";
+import { Request, Response } from 'express';
+import ReviewModel from '../models/ReviewModel';
 
 const reviewModel = new ReviewModel();
 
@@ -15,10 +15,10 @@ export const createReview = async (
       rating,
       review_text,
     });
-    res.status(201).json({ message: "Review created successfully", reviewId });
+    res.status(201).json({ message: 'Review created successfully', reviewId });
   } catch (error) {
-    console.error("Error creating review:", error);
-    res.status(500).json({ message: "Error creating review", error });
+    console.error('Error creating review:', error);
+    res.status(500).json({ message: 'Error creating review', error });
   }
 };
 
@@ -31,13 +31,13 @@ export const getReviewById = async (
     const review = await reviewModel.getReviewById(Number(id));
 
     if (!review) {
-      res.status(404).json({ message: "Review not found" });
+      res.status(404).json({ message: 'Review not found' });
     } else {
       res.status(200).json(review);
     }
   } catch (error) {
-    console.error("Error fetching review:", error);
-    res.status(500).json({ message: "Error fetching review", error });
+    console.error('Error fetching review:', error);
+    res.status(500).json({ message: 'Error fetching review', error });
   }
 };
 
@@ -49,10 +49,10 @@ export const updateReview = async (
     const { id } = req.params;
     const updates = req.body;
     await reviewModel.updateReview(Number(id), updates);
-    res.status(200).json({ message: "Review updated successfully" });
+    res.status(200).json({ message: 'Review updated successfully' });
   } catch (error) {
-    console.error("Error updating review:", error);
-    res.status(500).json({ message: "Error updating review", error });
+    console.error('Error updating review:', error);
+    res.status(500).json({ message: 'Error updating review', error });
   }
 };
 
@@ -63,9 +63,9 @@ export const deleteReview = async (
   try {
     const { id } = req.params;
     await reviewModel.deleteReview(Number(id));
-    res.status(200).json({ message: "Review deleted successfully" });
+    res.status(200).json({ message: 'Review deleted successfully' });
   } catch (error) {
-    console.error("Error deleting review:", error);
-    res.status(500).json({ message: "Error deleting review", error });
+    console.error('Error deleting review:', error);
+    res.status(500).json({ message: 'Error deleting review', error });
   }
 };
