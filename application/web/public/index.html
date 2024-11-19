@@ -4,25 +4,157 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rate My Video Game</title>
-    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #2a2a2a; /* Semi-dark gray */
+        color: #ffffff; /* White text */
+        margin: 0;
+        padding: 0;
+      }
+
+      .banner {
+        height: 16.67vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background-color: #343434; /* Slightly lighter gray */
+      }
+
+      .banner-picture {
+        background-image: url('bannerpic.png');
+        background-size: cover;
+        background-position: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        filter: grayscale(50%) brightness(0.5);
+      }
+
+      .banner-content {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 20px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .title {
+        align-self: center;
+        font-size: 2rem;
+        color: transparent;
+        -webkit-text-stroke: 1px #ffffff; /* White outline */
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5); /* Shadow effect */
+      }
+
+      .dropdown {
+        position: absolute;
+        top: 20%;
+        left: 3%;
+      }
+
+      .dropdown-button {
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: 1px solid #bfa84b; /* Less vibrant gold */
+        background-color: #343434;
+        color: #ffffff;
+        cursor: pointer;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #1e1e2e; /* Navy */
+        min-width: 200px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 10px;
+      }
+
+      .dropdown-content a {
+        color: #bfa84b; /* Less vibrant gold */
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        border-radius: 5px;
+      }
+
+      .dropdown-content a:hover {
+        background-color: #b39393;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .content-section {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .search-bar {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .search-input {
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: 1px solid #bfa84b;
+        background-color: #343434;
+        color: #ffffff;
+        outline: none;
+        font-size: 16px;
+      }
+
+      .search-button {
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: 1px solid #bfa84b;
+        background-color: #bfa84b;
+        color: #343434;
+        margin-left: 10px;
+        cursor: pointer;
+      }
+
+      .search-button:hover {
+        background-color: #a6923c;
+      }
+
+      footer {
+        background-color: #343434;
+        color: #b0b0b0;
+        text-align: center;
+        padding: 10px 0;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
     <header class="banner">
       <div class="banner-picture"></div>
       <div class="banner-content">
         <h1 class="title">Rate My Video Game</h1>
-        <div class="buttons">
-          <a href="signup.html" class="pill-button">Sign Up</a>
-          <a href="login.html" class="pill-button">Login</a>
-          <a href="reccomendation.html" class="pill-button"
-            >Recommendation Demo</a
-          >
-          <button id="google-login-button" class="pill-button">
-            Login with Google
-          </button>
-        </div>
       </div>
     </header>
+
+    <div class="dropdown">
+      <button class="dropdown-button">Menu</button>
+      <div class="dropdown-content">
+        <a href="reccomendation.html">Recommendation Demo</a>
+        <a href="login.html">Logout</a>
+      </div>
+    </div>
 
     <section class="content-section">
       <div class="search-bar">
@@ -36,8 +168,8 @@
       <div id="gameGrid" class="grid"></div>
     </section>
 
-    <div id="recommendations"></div>
-    <!-- Add this div for recommendations -->
-    <script src="script.js"></script>
+    <footer>
+      <p>Rate My Video Game &copy; 2024</p>
+    </footer>
   </body>
 </html>

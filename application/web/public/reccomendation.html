@@ -4,12 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Recommendations</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Recommended Games</h1>
-    <button id="recommendation-button">Get Recommendations</button>
-    <div id="recommendations"></div>
-    <!-- Add this div for recommendations -->
+    <header class="banner">
+      <div class="banner-picture"></div>
+      <div class="banner-content">
+        <h1 class="title">Rate My Video Game</h1>
+      </div>
+    </header>
+
+    <div class="dropdown" style="position: absolute; top: 20%; left: 3%;">
+      <button class="dropdown-button">Menu</button>
+      <div class="dropdown-content">
+        <a href="index.html">Home Page</a>
+      </div>
+    </div>
+
+    <section class="content-section">
+      <h1 style="text-align: center; margin-top: 10vh;">Recommended Games</h1>
+      <div style="display: flex; justify-content: center; margin-top: 5vh;">
+        <button id="recommendation-button" style="padding: 10px 20px; border-radius: 10px; background-color: #c0aeae; border: none; cursor: pointer;">
+          Get Recommendations
+        </button>
+      </div>
+      <div id="recommendations" style="margin-top: 5vh; padding: 20px; text-align: center;"></div>
+    </section>
 
     <script src="script.js"></script>
   </body>
