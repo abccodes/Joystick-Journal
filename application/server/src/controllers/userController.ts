@@ -16,7 +16,6 @@ export const getUser = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Sends selected user info fetched from the database as a JSON response
     res.json({
       id: fullUserData.id,
       name: fullUserData.name,
@@ -76,7 +75,7 @@ export const getUserByUserName = async (req: Request, res: Response) => {
 
 export const updateUserProfilePicture = async (req: Request, res: Response) => {
   try {
-    const userId = req.body.userId; // Assuming the user ID is provided in the request body
+    const userId = req.body.userId;
     const file = req.file;
 
     if (!file) {
@@ -87,7 +86,10 @@ export const updateUserProfilePicture = async (req: Request, res: Response) => {
     const imageUrl = `http://localhost:3000/uploads/${file.filename}`;
 
     // Use the User model to update the user's profile picture URL in the database
-    const updateSuccessful = await User.updateUserProfilePicture(userId, imageUrl);
+    const updateSuccessful = await User.updateUserProfilePicture(
+      userId,
+      imageUrl
+    );
 
     if (!updateSuccessful) {
       return res.status(404).json({ error: 'User not found' });

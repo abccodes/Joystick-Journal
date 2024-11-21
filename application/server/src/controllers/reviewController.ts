@@ -69,7 +69,7 @@ export const getReviewByGameId = async (
     if (!reviews || reviews.length === 0) {
       res.status(404).json({ message: 'No reviews found for this game' });
     } else {
-      res.status(200).json(reviews); // Send the array of reviews
+      res.status(200).json(reviews);
     }
   } catch (error) {
     console.error('Error fetching reviews by gameId:', error);
