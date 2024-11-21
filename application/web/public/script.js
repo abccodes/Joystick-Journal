@@ -1,17 +1,6 @@
-let userId = null; // Global variable to store the logged-in user's ID
+let userId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // DOM Elements
-  // const searchTerm = 'f';
-  // const response = await fetch(
-  //   `http://127.0.0.1:8000/api/games/search?query=${encodeURIComponent(
-  //     searchTerm
-  //   )}`,
-  //   { credentials: 'include' }
-  // );
-
-  // console.log('Response:', response);
-
   const logoutButton = document.getElementById('logout-btn');
   const signupButton = document.querySelector('a[href="signup.html"]');
   const loginButton = document.querySelector('a[href="login.html"]');
@@ -22,7 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const recommendationButton = document.getElementById('recommendation-button');
   const googleLoginButton = document.getElementById('google-login-button');
 
-  // Check Authentication Status
   const checkAuthStatus = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/auth/status', {
@@ -38,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         console.log(`User is logged in. User ID: ${userId}`);
 
-        // Show/Hide elements based on their existence
         if (logoutButton) logoutButton.style.display = 'inline-block';
         if (signupButton) signupButton.style.display = 'none';
         if (loginButton) loginButton.style.display = 'none';
@@ -46,7 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         console.log('User is not logged in');
 
-        // Show/Hide elements based on their existence
         if (logoutButton) logoutButton.style.display = 'none';
         if (settingsButton) settingsButton.style.display = 'none';
         if (signupButton) signupButton.style.display = 'inline-block';
@@ -57,7 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // Login Logic
   const loginForm = document.querySelector('.login-form');
   if (loginForm && loginForm.id !== 'signup-form') {
     loginForm.addEventListener('submit', async event => {
@@ -75,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (response.ok) {
           const data = await response.json();
-          userId = data.id; // Store user ID from login response
+          userId = data.id;
           console.log('User ID stored after login:', userId);
           alert(`Welcome, ${data.name}!`);
           window.location.href = 'index.html';
@@ -89,7 +74,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Signup Logic
   const signupForm = document.getElementById('signup-form');
   if (signupForm) {
     signupForm.addEventListener('submit', async event => {
@@ -129,7 +113,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Logout Functionality
   if (logoutButton) {
     logoutButton.addEventListener('click', async event => {
       event.preventDefault();
@@ -141,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (response.ok) {
           alert('Successfully logged out');
-          window.location.href = 'index.html'; // Reload to the home page
+          window.location.href = 'index.html';
         } else {
           alert('Logout failed. Please try again.');
         }
@@ -152,15 +135,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Fetch Recommendations
   if (recommendationButton) {
     recommendationButton.addEventListener('click', async () => {
       const recommendationsDiv = document.getElementById('recommendations');
       recommendationsDiv.innerHTML = '';
 
       try {
+        console.log('Fetching recommendations for user ID:', userId);
         const response = await fetch(
-          'http://127.0.0.1:8000/api/userdata/2/recommendations',
+          `http://127.0.0.1:8000/api/userdata/${userId}/recommendations`,
           {
             credentials: 'include',
           }
@@ -190,13 +173,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Google Login
   if (googleLoginButton) {
     googleLoginButton.addEventListener('click', () => {
       window.location.href = 'http://127.0.0.1:8000/api/auth/google';
     });
   }
-  // Update Profile Information/Settings
+
   const updateProfileInformation = async () => {
     const currentPath = window.location.pathname.split('/').pop();
     if (currentPath !== 'view-profile.html') return;
@@ -234,41 +216,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // Initialize on Page Load
   await checkAuthStatus();
   await updateProfileInformation();
-  // Select the profile picture elements
   const profilePicUpload = document.getElementById('profilePicUpload');
   const profilePic = document.getElementById('profilePic');
 
-  // Only add the event listener if the elements exist
   if (profilePicUpload && profilePic) {
     profilePicUpload.addEventListener('change', async function (event) {
-      console.log('File selected'); // Log to verify event trigger
+      console.log('File selected');
       const file = event.target.files[0];
 
       if (file) {
-        // Display the preview
         const reader = new FileReader();
         reader.onload = function (e) {
-          console.log('Image loaded'); // Log to verify loading
-          profilePic.src = e.target.result; // Set the profile picture src to the uploaded image's data URL
+          console.log('Image loaded');
+          profilePic.src = e.target.result;
         };
         reader.readAsDataURL(file);
 
-        // Create FormData object to send the file to the server
         const formData = new FormData();
         formData.append('profilePicture', file);
-        formData.append('userId', userId); // Assuming you have `userId` from the auth status
+        formData.append('userId', userId);
 
         try {
-          // Send the image to your server
           const response = await fetch(
             'http://127.0.0.1:8000/api/users/upload-profile-picture',
             {
               method: 'POST',
               body: formData,
-              credentials: 'include', // Include credentials if needed
+              credentials: 'include',
             }
           );
 
@@ -297,29 +273,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (searchTerm) {
         try {
           const response = await fetch(
-            `http://localhost:8000/api/games/search?query=${encodeURIComponent(
+            `http://127.0.0.1:8000/api/games/search?query=${encodeURIComponent(
               searchTerm
             )}`,
-            {
-              credentials: 'include',
-            }
+            { credentials: 'include' }
           );
 
-          if (!response.ok) throw new Error('Network response was not ok');
-
           const games = await response.json();
+
+          console.log(games);
+
           gameGrid.innerHTML = '';
+
           games.forEach(game => {
             const gameTile = document.createElement('div');
             gameTile.className = 'game-tile';
-            gameTile.textContent = game.title;
+
+            const gameImage = document.createElement('img');
+            gameImage.src = game.cover_image
+              ? game.cover_image
+              : 'gameinfo_testimage.png';
+            gameImage.alt = game.title;
+            gameTile.appendChild(gameImage);
+
+            gameTile.addEventListener('click', () => {
+              window.location.href = `game-info.html?gameId=${game.game_id}`;
+            });
+
             gameGrid.appendChild(gameTile);
           });
         } catch (error) {
           console.error('Error fetching games:', error);
         }
-      } else {
-        alert('Please enter a search term');
       }
     });
   }
