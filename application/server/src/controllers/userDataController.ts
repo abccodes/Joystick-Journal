@@ -8,6 +8,12 @@ import { verifyOwnership } from './helper/auth';
 
 const userDataModel = new UserDataModel();
 
+/**
+ * Controller: getUserDataById
+ * Description: Retrieves user data by its ID and verifies ownership before returning it.
+ * @param req - The incoming HTTP request.
+ * @param res - The outgoing HTTP response.
+ */
 export const getUserDataById = async (
   req: Request,
   res: Response
@@ -29,6 +35,12 @@ export const getUserDataById = async (
   }
 };
 
+/**
+ * Controller: updateUserData
+ * Description: Updates user data by its ID after verifying ownership.
+ * @param req - The incoming HTTP request containing update fields.
+ * @param res - The outgoing HTTP response.
+ */
 export const updateUserData = async (
   req: Request,
   res: Response
@@ -47,6 +59,12 @@ export const updateUserData = async (
   }
 };
 
+/**
+ * Controller: getRecommendations
+ * Description: Fetches game recommendations for a user based on their data.
+ * @param req - The incoming HTTP request containing the user's ID.
+ * @param res - The outgoing HTTP response containing the recommendations.
+ */
 export const getRecommendations = async (
   req: Request,
   res: Response
@@ -75,6 +93,12 @@ export const getRecommendations = async (
   }
 };
 
+/**
+ * Controller: createUserData
+ * Description: Creates a new user data entry in the database.
+ * @param req - The incoming HTTP request containing user data fields.
+ * @param res - The outgoing HTTP response with the newly created user data ID.
+ */
 export const createUserData = async (
   req: Request,
   res: Response
@@ -94,6 +118,12 @@ export const createUserData = async (
   }
 };
 
+/**
+ * Controller: deleteUserData
+ * Description: Deletes a user data entry by its ID.
+ * @param req - The incoming HTTP request containing the user data ID.
+ * @param res - The outgoing HTTP response confirming the deletion.
+ */
 export const deleteUserData = async (
   req: Request,
   res: Response
@@ -108,6 +138,12 @@ export const deleteUserData = async (
   }
 };
 
+/**
+ * Controller: fetchUserData
+ * Description: Fetches user data by user ID.
+ * @param req - The incoming HTTP request containing the user's ID.
+ * @param res - The outgoing HTTP response containing the user data.
+ */
 export const fetchUserData = async (
   req: Request,
   res: Response

@@ -16,36 +16,46 @@ import authRouter from './routes/authRoutes';
 import userDataRouter from './routes/userDataRoutes';
 import userRouter from './routes/userRoutes';
 import gameRouter from './routes/gameRoutes';
-import reviewRoter from './routes/reviewRoutes';
+import reviewRouter from './routes/reviewRoutes';
 import recommendations from './routes/recommendationRoutes';
 
 dotenv.config();
 
+// Create the Express app
 const app = express();
 
+/**
+ * Middleware: Helmet
+ * Description: Secures HTTP headers and adds a content security policy.
+ */
 app.use(helmet());
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         'default-src': ["'self'"],
-        'connect-src': ["'self'", 'http://127.0.0.1:8000'],
+        'connect-src': ["'self'", 'http://127.0.0.1:8000'], // Add other sources if required
       },
     },
   })
 );
 
+/**
+ * Middleware: CORS
+ * Description: Restricts access to specified origins.
+ */
 const allowedOrigins = [
   'http://localhost:8000',
   'http://127.0.0.1:8000',
   'http://localhost:3000',
   'http://127.0.0.1:5500',
   'https://gameratings-63hlr9lx0-abccodes-projects.vercel.app/',
+  // 'https://your-production-domain.com', // Uncomment for production
 ];
 
 app.use(
   cors({
-    origin: function(origin, callback) {
+    origin: function (origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -58,22 +68,30 @@ app.use(
   })
 );
 
+// Middleware: Cookie parser
 app.use(cookieParser());
+
+// Middleware: Body parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Middleware: Serve static files (e.g., index.html)
 app.use(express.static(path.join(__dirname, '../../web/public')));
 
+/**
+ * Middleware: Passport.js
+ * Description: Configures Google OAuth strategy for user authentication.
+ */
 app.use(passport.initialize());
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID!, // Ensure you have GOOGLE_CLIENT_ID in your .env
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // Ensure you have GOOGLE_CLIENT_SECRET in your .env
-      callbackURL: '/api/auth/google/callback', // This should match the route in your authRouter
+      clientID: process.env.GOOGLE_CLIENT_ID!, // Ensure GOOGLE_CLIENT_ID exists in .env
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // Ensure GOOGLE_CLIENT_SECRET exists in .env
+      callbackURL: '/api/auth/google/callback', // This route must match the authRouter configuration
     },
     (accessToken, refreshToken, profile, done) => {
-      // For now, we'll just pass the profile on
+      // For now, we'll just pass the profile along
       return done(null, profile);
     }
   )
@@ -85,20 +103,33 @@ passport.deserializeUser((obj: any, done) => {
   done(null, obj as Express.User);
 });
 
+/**
+ * Error Handling Middleware
+ */
 app.use(errorHandler);
 
-app.use('/api/auth', authRouter);
-app.use('/api/users', authenticate, userRouter);
-app.use('/api/games', gameRouter);
-app.use('/api/userdata', userDataRouter);
-app.use('/api/reviews', reviewRoter);
-app.use('/api/recommendations', recommendations);
+/**
+ * Routes
+ */
+app.use('/api/auth', authRouter); // Authentication routes
+app.use('/api/users', authenticate, userRouter); // User routes, protected with `authenticate`
+app.use('/api/games', gameRouter); // Game routes
+app.use('/api/userdata', userDataRouter); // User data routes
+app.use('/api/reviews', reviewRouter); // Review routes
+app.use('/api/recommendations', recommendations); // Recommendation routes
 
-// Fallback root route if index.html is not found
+/**
+ * Fallback route
+ * Description: Root route that responds if no specific route is matched.
+ */
 app.get('/', (req, res) => {
   res.send('The server is working, but the index page isn’t loading.');
 });
 
+/**
+ * Database Connection
+ * Description: Initializes the user database connection. Consider removing if unused in favor of `getPool`.
+ */
 connectUserDB();
 
 export default app;

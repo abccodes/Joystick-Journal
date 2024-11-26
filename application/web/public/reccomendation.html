@@ -4,13 +4,120 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Recommendations</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Recommended Games</h1>
-    <button id="recommendation-button">Get Recommendations</button>
-    <div id="recommendations"></div>
-    <!-- Add this div for recommendations -->
+    <!-- Header Section -->
+    <header class="banner">
+      <div class="banner-picture"></div>
+      <div class="banner-content">
+        <h1 class="title">
+          <a href="index.html" class="title-link">Rate My Video Game</a>
+        </h1>
+        <div class="buttons">
+          <a href="signup.html" class="pill-button">Sign Up</a>
+          <a href="login.html" class="pill-button">Login</a>
+          <a href="#" class="pill-button" id="logout-btn" style="display: none;">Logout</a>
+          <a href="view-profile.html" class="pill-button" id="settings-btn" style="display: none;">Settings</a>
+        </div>
+      </div>
+    </header>
 
-    <script src="script.js"></script>
+    <!-- Content Section -->
+    <section class="content-section">
+      <h1>Recommended Games</h1>
+      <button id="recommendation-button" class="pill-button">Get Recommendations</button>
+      <div id="recommendationGrid" class="grid">
+        <!-- Recommended game tiles will be dynamically added here -->
+      </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+      <ul class="footer-links">
+        <li><a href="#">Ad Choices</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </footer>
+
+    <script>
+      document.getElementById("recommendation-button").addEventListener("click", async () => {
+        const userId = localStorage.getItem("userId"); // Assuming user ID is stored in local storage
+        if (!userId) {
+          alert("You need to log in to get recommendations.");
+          window.location.href = "login.html"; // Redirect to login page
+          return;
+        }
+
+        try {
+          const response = await fetch(`http://127.0.0.1:8000/api/recommendations/${userId}`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch recommendations.");
+          }
+
+          const recommendations = await response.json();
+          const recommendationGrid = document.getElementById("recommendationGrid");
+          recommendationGrid.innerHTML = ""; // Clear previous recommendations
+
+          // Render recommendations
+          recommendations.forEach((game) => {
+            const gameTile = document.createElement("div");
+            gameTile.className = "game-tile";
+            gameTile.innerHTML = `
+              <img src="${game.cover_image || 'default-recommendation-image.jpg'}" alt="${game.title}" />
+              <p>${game.title}</p>
+            `;
+            gameTile.addEventListener("click", () => {
+              // Redirect to game info page
+              window.location.href = `game-info.html?gameId=${game.game_id}`;
+            });
+            recommendationGrid.appendChild(gameTile);
+          });
+        } catch (error) {
+          console.error("Error fetching recommendations:", error);
+          alert("An error occurred while fetching recommendations. Please try again later.");
+        }
+      });
+    </script>
   </body>
 </html>
+
+
+<!-- Key Improvements:
+Header Integration:
+
+Reused the header structure from index.html to maintain consistency across pages.
+Dynamic Recommendations Grid:
+
+A grid layout (recommendationGrid) dynamically displays recommended games using data fetched from the backend.
+User Authentication Check:
+
+Checks if the user is logged in by verifying the presence of a userId in localStorage.
+Redirects to the login page if the user is not authenticated.
+Error Handling:
+
+Alerts the user if fetching recommendations fails, with console logging for debugging.
+Navigation to Game Info:
+
+Clicking on a game tile navigates the user to a detailed game info page (game-info.html).
+Styling:
+
+Applied consistent styling (pill-button, grid, game-tile) to match other pages.
+Footer Section:
+
+Added a footer with links for legal and privacy information.
+
+User Flow:
+Initial State:
+
+User sees a button to get recommendations and a grid for displaying recommended games.
+Fetching Recommendations:
+
+Clicking the "Get Recommendations" button triggers an API call to fetch personalized recommendations.
+Displaying Recommendations:
+
+Recommended games are displayed in a visually appealing grid format with clickable tiles.
+Authentication Handling:
+
+Unauthenticated users are redirected to the login page before they can fetch recommendations. -->

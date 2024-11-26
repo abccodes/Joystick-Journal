@@ -2,6 +2,13 @@ import { Request, Response } from 'express';
 import { User as UserInterface } from '../interfaces/User';
 import User from '../models/UserModel';
 
+/**
+ * Controller: getUser
+ * Description: Fetches the authenticated user's details using the `req.user` object.
+ * Responds with a subset of user data.
+ * @param req - The incoming HTTP request containing the authenticated user.
+ * @param res - The outgoing HTTP response containing user data.
+ */
 export const getUser = async (req: Request, res: Response) => {
   try {
     const user = req.user as UserInterface | undefined;
@@ -32,6 +39,12 @@ export const getUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Controller: getUserByEmail
+ * Description: Fetches a user's details by their email address.
+ * @param req - The incoming HTTP request containing the user's email in params.
+ * @param res - The outgoing HTTP response containing user data.
+ */
 export const getUserByEmail = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
@@ -53,6 +66,12 @@ export const getUserByEmail = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Controller: getUserByUserName
+ * Description: Fetches a user's details by their username.
+ * @param req - The incoming HTTP request containing the username in params.
+ * @param res - The outgoing HTTP response containing user data.
+ */
 export const getUserByUserName = async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
@@ -74,6 +93,13 @@ export const getUserByUserName = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Controller: updateUserProfilePicture
+ * Description: Updates the authenticated user's profile picture.
+ * Assumes the file is uploaded via middleware and stored locally.
+ * @param req - The incoming HTTP request containing the user ID and file.
+ * @param res - The outgoing HTTP response confirming the update.
+ */
 export const updateUserProfilePicture = async (req: Request, res: Response) => {
   try {
     const userId = req.body.userId; // Assuming the user ID is provided in the request body

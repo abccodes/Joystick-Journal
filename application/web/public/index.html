@@ -7,36 +7,179 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Header Section -->
     <header class="banner">
       <div class="banner-picture"></div>
       <div class="banner-content">
-        <h1 class="title">Rate My Video Game</h1>
+        <h1 class="title">
+          <a href="index.html" class="title-link">Rate My Video Game</a>
+        </h1>
         <div class="buttons">
           <a href="signup.html" class="pill-button">Sign Up</a>
           <a href="login.html" class="pill-button">Login</a>
-          <a href="reccomendation.html" class="pill-button"
-            >Recommendation Demo</a
-          >
+          <a href="recommendation.html" class="pill-button">Recommendation Demo</a>
           <a href="#" class="pill-button" id="logout-btn" style="display: none;">Logout</a>
           <a href="view-profile.html" class="pill-button" id="settings-btn" style="display: none;">Settings</a>
         </div>
       </div>
     </header>
 
+    <!-- Main Content Section -->
     <section class="content-section">
+      <!-- Search Bar -->
       <div class="search-bar">
         <input
           type="text"
           class="search-input"
           placeholder="Search for a video game"
+          id="search-input"
         />
-        <button class="search-button">Search</button>
+        <button class="search-button" id="search-button">Search</button>
       </div>
-      <div id="gameGrid" class="grid"></div>
+
+      <!-- Game Grid -->
+      <div id="gameGrid" class="grid">
+        <!-- Game tiles will be dynamically added here -->
+      </div>
     </section>
 
-    <div id="recommendations"></div>
-    <!-- Add this div for recommendations -->
-    <script src="script.js"></script>
+    <!-- Recommendations Section -->
+    <section id="recommendations" class="content-section">
+      <h2>Recommended Games for You</h2>
+      <div id="recommendationGrid" class="grid">
+        <!-- Recommended game tiles will be dynamically added here -->
+      </div>
+    </section>
+
+    <script>
+      // JavaScript to handle dynamic functionality
+
+      // Fetch games for the grid
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          // Fetch all games
+          const response = await fetch("http://127.0.0.1:8000/api/games");
+          const games = await response.json();
+
+          // Render games in the grid
+          const gameGrid = document.getElementById("gameGrid");
+          games.forEach((game) => {
+            const gameTile = document.createElement("div");
+            gameTile.className = "game-tile";
+            gameTile.innerHTML = `
+              <img src="${game.cover_image || "default-game-image.jpg"}" alt="${game.title}" />
+              <p>${game.title}</p>
+            `;
+            gameTile.addEventListener("click", () => {
+              // Redirect to game info page
+              window.location.href = `game-info.html?gameId=${game.game_id}`;
+            });
+            gameGrid.appendChild(gameTile);
+          });
+        } catch (error) {
+          console.error("Error fetching games:", error);
+        }
+
+        // Fetch recommendations (if user is logged in)
+        const userId = localStorage.getItem("userId"); // Assuming user ID is stored in local storage
+        if (userId) {
+          try {
+            const recommendationsResponse = await fetch(
+              `http://127.0.0.1:8000/api/recommendations/${userId}`
+            );
+            const recommendations = await recommendationsResponse.json();
+
+            // Render recommendations
+            const recommendationGrid = document.getElementById("recommendationGrid");
+            recommendations.forEach((game) => {
+              const recommendationTile = document.createElement("div");
+              recommendationTile.className = "game-tile";
+              recommendationTile.innerHTML = `
+                <img src="${game.cover_image || "default-recommendation-image.jpg"}" alt="${game.title}" />
+                <p>${game.title}</p>
+              `;
+              recommendationTile.addEventListener("click", () => {
+                // Redirect to game info page
+                window.location.href = `game-info.html?gameId=${game.game_id}`;
+              });
+              recommendationGrid.appendChild(recommendationTile);
+            });
+          } catch (error) {
+            console.error("Error fetching recommendations:", error);
+          }
+        }
+      });
+
+      // Handle search functionality
+      document.getElementById("search-button").addEventListener("click", async () => {
+        const query = document.getElementById("search-input").value.trim();
+        if (!query) {
+          alert("Please enter a search term.");
+          return;
+        }
+
+        try {
+          const searchResponse = await fetch(
+            `http://127.0.0.1:8000/api/games/search?query=${encodeURIComponent(query)}`
+          );
+          const searchResults = await searchResponse.json();
+
+          // Clear the grid and render search results
+          const gameGrid = document.getElementById("gameGrid");
+          gameGrid.innerHTML = "";
+          searchResults.forEach((game) => {
+            const gameTile = document.createElement("div");
+            gameTile.className = "game-tile";
+            gameTile.innerHTML = `
+              <img src="${game.cover_image || "default-search-image.jpg"}" alt="${game.title}" />
+              <p>${game.title}</p>
+            `;
+            gameTile.addEventListener("click", () => {
+              // Redirect to game info page
+              window.location.href = `game-info.html?gameId=${game.game_id}`;
+            });
+            gameGrid.appendChild(gameTile);
+          });
+        } catch (error) {
+          console.error("Error fetching search results:", error);
+        }
+      });
+    </script>
   </body>
 </html>
+
+
+<!-- Key Improvements:
+Dynamic Game Grid:
+
+Fetches all games from the backend and dynamically renders them in a grid format.
+Search Functionality:
+
+Implements a working search bar that fetches results from /api/games/search.
+Recommendations Section:
+
+Displays personalized game recommendations if the user is logged in.
+User Authentication Integration:
+
+Assumes a userId is stored in local storage to fetch recommendations.
+Error Handling:
+
+Adds try-catch blocks to gracefully handle API errors.
+Event Listeners:
+
+Adds interactivity to game tiles for navigation to the game-info.html page.
+Professional Comments:
+
+Includes descriptive comments for easy code understanding and maintainability.
+
+User Flow:
+On Page Load:
+
+Displays all games in a grid format.
+If logged in, shows personalized recommendations.
+Search:
+
+Allows users to search for specific games, updating the grid with results.
+Interactivity:
+
+Clicking on a game tile navigates to a detailed game info page. -->

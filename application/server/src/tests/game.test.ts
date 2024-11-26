@@ -11,18 +11,13 @@ import {
 let pool = getPool();
 
 describe('Games API Tests', () => {
+  // Reset and seed the database before each test
   beforeEach(async () => {
     await resetDatabase();
     await seedDatabase();
-  });
 
-  afterAll(async () => {
-    await closeDatabase();
-  });
-
-  beforeEach(async () => {
+    // Insert some initial game data for testing
     await pool.query('DELETE FROM games');
-
     await pool.query(`
       INSERT INTO games (title, description, genre, tags, platforms, playtime_estimate, developer, publisher, game_mode, release_date, review_rating, cover_image)
       VALUES
@@ -32,6 +27,16 @@ describe('Games API Tests', () => {
     `);
   });
 
+  // Close the database connection after all tests are complete
+  afterAll(async () => {
+    await closeDatabase();
+  });
+
+  /**
+   * Test case: Adding a new game
+   * Verifies that a new game can be successfully added to the database.
+   * Also checks if the inserted data is correctly stored and matches the request payload.
+   */
   it('should add a new game successfully', async () => {
     const newGame = {
       title: 'New Game',
@@ -48,9 +53,7 @@ describe('Games API Tests', () => {
       cover_image: '/assets/images/newgame.jpg',
     };
 
-    const res = await request(app)
-      .post('/api/games/create')
-      .send(newGame);
+    const res = await request(app).post('/api/games/create').send(newGame);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toHaveProperty('message', 'Game created successfully');
@@ -62,6 +65,7 @@ describe('Games API Tests', () => {
 
     expect(games.length).toEqual(1);
 
+    // Parse JSON fields and validate against the payload
     const dbTags =
       typeof games[0].tags === 'string'
         ? JSON.parse(games[0].tags)
@@ -75,16 +79,22 @@ describe('Games API Tests', () => {
     expect(dbPlatforms).toEqual(newGame.platforms);
   });
 
+  /**
+   * Test case: Searching games by a partial query
+   * Ensures that the search endpoint can retrieve games based on a partial title match.
+   */
   it('should return games that partially match the query', async () => {
-    const res = await request(app)
-      .get('/api/games/search?query=Fort')
-      .send();
+    const res = await request(app).get('/api/games/search?query=Fort').send();
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.length).toBeGreaterThan(0);
     expect(res.body[0]).toHaveProperty('title', 'Fortnite');
   });
 
+  /**
+   * Test case: Handling a search with no results
+   * Validates that the API returns a 404 status and an appropriate error message when no games are found.
+   */
   it('should return 404 if no games match the query', async () => {
     const res = await request(app)
       .get('/api/games/search?query=UnknownGame')
@@ -94,21 +104,57 @@ describe('Games API Tests', () => {
     expect(res.body).toHaveProperty('message', 'No games found');
   });
 
+  /**
+   * Test case: Retrieving a game by ID
+   * Checks that a game can be fetched by its unique ID and that all relevant fields are returned.
+   */
   it('should retrieve a game by ID', async () => {
     const [game] = await pool.query<RowDataPacket[]>(
       "SELECT game_id FROM games WHERE title = 'Minecraft'"
     );
     const gameId = game[0].game_id;
 
-    const res = await request(app)
-      .get(`/api/games/${gameId}`)
-      .send();
+    const res = await request(app).get(`/api/games/${gameId}`).send();
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('title', 'Minecraft');
     expect(res.body).toHaveProperty('game_mode', 'both');
   });
 
+  /**
+   * Test case: Updating an existing game
+   * Validates that game details can be updated and that the changes are correctly reflected in the database.
+   */
+  it('should update a game successfully', async () => {
+    const [game] = await pool.query<RowDataPacket[]>(
+      "SELECT game_id FROM games WHERE title = 'FIFA 21'"
+    );
+    const gameId = game[0].game_id;
+
+    const updates = {
+      title: 'FIFA 22',
+      review_rating: 9,
+    };
+
+    const res = await request(app).put(`/api/games/${gameId}`).send(updates);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('message', 'Game updated successfully');
+
+    const [updatedGame] = await pool.query<RowDataPacket[]>(
+      'SELECT * FROM games WHERE game_id = ?',
+      [gameId]
+    );
+
+    expect(updatedGame[0].title).toEqual('FIFA 22');
+    expect(updatedGame[0].review_rating).toEqual(9);
+  });
+
+  /**
+   * Test case: Deleting a game by ID
+   * Verifies that a game can be deleted by its ID and is removed from the database.
+   */
+  // Uncomment this test if the delete functionality is active in the app
   // it('should delete a game by ID', async () => {
   //   const [game] = await pool.query<RowDataPacket[]>(
   //     "SELECT game_id FROM games WHERE title = 'Fortnite'"
@@ -128,29 +174,4 @@ describe('Games API Tests', () => {
   //   );
   //   expect(deletedGame.length).toEqual(0);
   // });
-
-  it('should update a game successfully', async () => {
-    const [game] = await pool.query<RowDataPacket[]>(
-      "SELECT game_id FROM games WHERE title = 'FIFA 21'"
-    );
-    const gameId = game[0].game_id;
-
-    const updates = {
-      title: 'FIFA 22',
-      review_rating: 9,
-    };
-    const res = await request(app)
-      .put(`/api/games/${gameId}`)
-      .send(updates);
-
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('message', 'Game updated successfully');
-
-    const [updatedGame] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM games WHERE game_id = ?',
-      [gameId]
-    );
-    expect(updatedGame[0].title).toEqual('FIFA 22');
-    expect(updatedGame[0].review_rating).toEqual(9);
-  });
 });

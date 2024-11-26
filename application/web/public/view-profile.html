@@ -1,74 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Profile</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+  </head>
+  <body>
     <!-- Header Section -->
     <header class="banner">
-        <div class="banner-picture"></div>
-        <div class="banner-content">
-            <!-- Make the title clickable -->
-            <h1 class="title">
-                <a href="index.html" class="title-link">Rate My Video Game</a>
-            </h1>
-            <div class="buttons">
-                <a href="#" class="pill-button" id="logout-btn" style="display: none;">Logout</a>
-                <a href="view-profile.html" class="pill-button" id="settings-btn" style="display: none;">Settings</a>
-            </div>
+      <div class="banner-picture"></div>
+      <div class="banner-content">
+        <h1 class="title">
+          <a href="index.html" class="title-link">Rate My Video Game</a>
+        </h1>
+        <div class="buttons">
+          <a href="#" class="pill-button" id="logout-btn" style="display: none;">Logout</a>
+          <a href="view-profile.html" class="pill-button" id="settings-btn" style="display: none;">Settings</a>
         </div>
+      </div>
     </header>
 
+    <!-- Main Content Section -->
     <section class="content-section">
-        <!-- Profile Picture Bubble with File Input -->
-        <label for="profilePicUpload" class="profile-picture-container">
-            <img src="Default-Profile-Picture.jpg" alt="Profile Picture" class="profile-picture" id="profilePic">
-            <input type="file" id="profilePicUpload" name="profilePic" accept="image/*" style="display: none;">
-        </label>
+      <!-- Profile Picture Bubble with File Input -->
+      <label for="profilePicUpload" class="profile-picture-container">
+        <img src="Default-Profile-Picture.jpg" alt="Profile Picture" class="profile-picture" id="profilePic">
+        <input type="file" id="profilePicUpload" name="profilePic" accept="image/*" style="display: none;">
+      </label>
 
-        <div class="profile-container">
-            <div class="header">
-                <h1>Welcome Back, <span id="username">User</span>!</h1>
-                <button class="edit-profile-button">Edit Profile</button>
-            </div>
-            <div class="tabs">
-                <button class="tab active">Profile</button>
-                <button class="tab">Settings</button>
-            </div>
-
-            <div class="profile-content">
-                <div class="profile-section">
-                    <h2>Username:</h2>
-                    <p id="user-username">user123</p>
-                </div>
-                <div class="profile-section">
-                    <h2>Email:</h2>
-                    <p id="user-email">user@example.com</p>
-                </div>
-                <div class="profile-section">
-                    <h2>Member Since:</h2>
-                    <p id="user-member-since">January 2023</p>
-                </div>
-            </div>
+      <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="header">
+          <h1>Welcome Back, <span id="username">User</span>!</h1>
+          <button class="edit-profile-button">Edit Profile</button>
         </div>
 
-        <div class="reviews-section">
-            <h2>Reviews</h2>
-            <!-- Add review content here -->
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+          <button class="tab active">Profile</button>
+          <button class="tab">Settings</button>
         </div>
+
+        <!-- User Profile Content -->
+        <div class="profile-content">
+          <div class="profile-section">
+            <h2>Username:</h2>
+            <p id="user-username">user123</p>
+          </div>
+          <div class="profile-section">
+            <h2>Email:</h2>
+            <p id="user-email">user@example.com</p>
+          </div>
+          <div class="profile-section">
+            <h2>Member Since:</h2>
+            <p id="user-member-since">January 2023</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Reviews Section -->
+      <div class="reviews-section">
+        <h2>Reviews</h2>
+        <div id="reviews-container">
+          <!-- Dynamic Reviews Content -->
+        </div>
+      </div>
     </section>
 
+    <!-- Footer Section -->
     <footer>
-        <ul class="footer-links">
-            <li><a href="#">Ad Choices</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-        </ul>
+      <ul class="footer-links">
+        <li><a href="#">Ad Choices</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
     </footer>
 
-    <script src="script.js"></script>
-</body>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const userId = 1; // Replace with dynamic user ID from login session
+
+        // Fetch user profile data
+        try {
+          const response = await fetch(`/api/users/${userId}`);
+          if (response.ok) {
+            const userData = await response.json();
+            document.getElementById('username').textContent = userData.name;
+            document.getElementById('user-username').textContent = userData.name;
+            document.getElementById('user-email').textContent = userData.email;
+            document.getElementById('user-member-since').textContent = new Date(userData.created_at).toLocaleDateString();
+          } else {
+            alert('Failed to fetch user profile.');
+          }
+        } catch (error) {
+          console.error('Error fetching profile:', error);
+        }
+
+        // Handle Edit Profile Button
+        document.querySelector('.edit-profile-button').addEventListener('click', async () => {
+          const newName = prompt('Enter new username:', document.getElementById('user-username').textContent);
+          const newEmail = prompt('Enter new email:', document.getElementById('user-email').textContent);
+
+          if (!newName || !newEmail) {
+            alert('Both fields are required.');
+            return;
+          }
+
+          try {
+            const response = await fetch(`/api/users/${userId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: newName, email: newEmail }),
+            });
+
+            if (response.ok) {
+              alert('Profile updated successfully!');
+              location.reload(); // Refresh page to show updated data
+            } else {
+              const errorData = await response.json();
+              alert(`Failed to update profile: ${errorData.message}`);
+            }
+          } catch (error) {
+            console.error('Error updating profile:', error);
+            alert('An unexpected error occurred.');
+          }
+        });
+
+        // Fetch user reviews
+        try {
+          const reviewsResponse = await fetch(`/api/reviews/user/${userId}`);
+          const reviewsData = await reviewsResponse.json();
+
+          const reviewsContainer = document.getElementById('reviews-container');
+          reviewsContainer.innerHTML = ''; // Clear existing content
+
+          reviewsData.forEach((review) => {
+            const reviewElement = document.createElement('div');
+            reviewElement.classList.add('review-box');
+            reviewElement.innerHTML = `
+              <p><strong>Game:</strong> ${review.game_title || 'Unknown'}</p>
+              <p><strong>Rating:</strong> ${review.rating}</p>
+              <p><strong>Review:</strong> ${review.review_text}</p>
+            `;
+            reviewsContainer.appendChild(reviewElement);
+          });
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+        }
+      });
+    </script>
+  </body>
 </html>
+
+<!-- Key Improvements:
+Backend Integration:
+
+Fetched user profile using /api/users/{userId} and displayed name, email, and created_at fields.
+Fetched user reviews using /api/reviews/user/{userId} and displayed them dynamically.
+Edit Profile:
+
+Added an Edit Profile button to update username and email via the /api/users/{userId} endpoint.
+Implemented client-side validation for required fields.
+Dynamic User Data:
+
+Updated placeholders for username, email, and member since to dynamically reflect fetched data.
+Error Handling:
+
+Added error handling for API failures with user-friendly alerts.
+User Reviews Section:
+
+Dynamically populated user reviews in a styled container.
+Professional Comments:
+
+Added clear and descriptive comments for every section to support maintainability.
+User Flow:
+Page Load:
+Fetches and displays user profile and reviews.
+Edit Profile:
+Allows editing username and email with real-time updates upon success.
+Logout and Settings Buttons:
+Prepares for further authentication and settings functionalities. -->

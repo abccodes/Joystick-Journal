@@ -4,15 +4,6 @@ import { getPool } from '../connections/database';
 import { RowDataPacket } from 'mysql2';
 import { CronJob } from 'cron';
 
-// Example usage for testing
-// testAddGames()
-//   .then(() => {
-//     console.log('success');
-//   })
-//   .catch(error => {
-//     console.log('error:', error);
-//   });
-
 dotenv.config();
 
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
@@ -38,11 +29,23 @@ interface GameData {
   metacritic: number | null;
 }
 
+/**
+ * Utility: stripHtmlTags
+ * Description: Removes HTML tags from a given string.
+ * @param str - The string to process.
+ * @returns A clean string without HTML tags.
+ */
 const stripHtmlTags = (str: string | null): string => {
   if (!str) return '';
   return str.replace(/<\/?[^>]+(>|$)/g, '');
 };
 
+/**
+ * Function: getMostPopularGames
+ * Description: Fetches the most popular games from the RAWG API based on rating.
+ * @param limit - The maximum number of games to fetch (default: 100).
+ * @returns An array of GameData objects.
+ */
 const getMostPopularGames = async (
   limit: number = 100
 ): Promise<GameData[]> => {
@@ -57,7 +60,6 @@ const getMostPopularGames = async (
       return [];
     }
     const data = await response.json();
-    console.log('data:', data);
     return data.results || [];
   } catch (error) {
     console.error('Error fetching most popular games:', error);
@@ -65,6 +67,12 @@ const getMostPopularGames = async (
   }
 };
 
+/**
+ * Function: getGameById
+ * Description: Fetches a game's details from the RAWG API by its ID.
+ * @param gameId - The ID of the game to fetch.
+ * @returns A GameData object or null if not found.
+ */
 const getGameById = async (gameId: number): Promise<GameData | null> => {
   try {
     const response = await fetch(
@@ -74,26 +82,29 @@ const getGameById = async (gameId: number): Promise<GameData | null> => {
       console.error(`Failed to fetch game: ${response.statusText}`);
       return null;
     }
-    const data: GameData = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Error fetching game:', error);
     return null;
   }
 };
 
+/**
+ * Function: addNewGamesToDatabase
+ * Description: Adds an array of games to the database after processing them.
+ * @param games - An array of games fetched from the RAWG API.
+ */
 const addNewGamesToDatabase = async (games: any[]): Promise<void> => {
   const pool = getPool();
   const gamesToInsert: any[] = [];
 
   for (const game of games) {
-    if (!game || typeof game !== 'object') {
-      console.error(`Invalid game object: ${JSON.stringify(game)}`);
-      console.log('Invalid game object:', game);
-      continue;
-    }
-
     try {
+      if (!game || typeof game !== 'object') {
+        console.error(`Invalid game object: ${JSON.stringify(game)}`);
+        continue;
+      }
+
       const title = game.name;
       if (!title) {
         console.error('Game title is undefined or empty');
@@ -112,23 +123,20 @@ const addNewGamesToDatabase = async (games: any[]): Promise<void> => {
       const publisher =
         game.publishers?.length > 0 ? game.publishers[0].name : 'Unknown';
 
-      // Validate and determine game_mode
-      const lowerCasePlatforms = platforms.toLowerCase();
       let game_mode: string = 'single-player';
+      const lowerCasePlatforms = platforms.toLowerCase();
       if (lowerCasePlatforms.includes('multiplayer')) {
         game_mode = 'multiplayer';
       } else if (lowerCasePlatforms.includes('both')) {
         game_mode = 'both';
       }
 
-      // Validate and clamp review_rating
       const rawRating = game.rating || 0;
       const review_rating = Math.min(Math.max(Math.round(rawRating), 1), 10);
 
       const release_date = game.released;
       const cover_image = game.background_image;
 
-      // Check if the game already exists
       const checkQuery = 'SELECT * FROM games WHERE title = ?';
       const [rows] = await pool.query<RowDataPacket[]>(checkQuery, [title]);
 
@@ -172,6 +180,12 @@ const addNewGamesToDatabase = async (games: any[]): Promise<void> => {
   }
 };
 
+/**
+ * Function: fetchNewGames
+ * Description: Fetches games released in the last 10 days.
+ * @param maxFetch - The maximum number of games to fetch (default: 50).
+ * @returns An array of games or an empty array if none found.
+ */
 const fetchNewGames = async (maxFetch: number = 50): Promise<any[]> => {
   const tenDaysAgo = new Date();
   tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
@@ -197,21 +211,18 @@ const fetchNewGames = async (maxFetch: number = 50): Promise<any[]> => {
   }
 };
 
+/**
+ * Function: testAddGames
+ * Description: Tests the process of fetching and adding games to the database.
+ */
 const testAddGames = async () => {
-  const amountOfGames = 50;
-
   try {
     console.log('Fetching new games...');
-
-    const gamesData = await fetchNewGames(amountOfGames);
+    const gamesData = await fetchNewGames(50);
 
     if (gamesData.length > 0) {
-      console.log(
-        `Fetched ${gamesData.length} games. Adding them to the database...`
-      );
-
+      console.log(`Fetched ${gamesData.length} games. Adding them to the database...`);
       await addNewGamesToDatabase(gamesData);
-
       console.log('Test games added successfully.');
     } else {
       console.log('No new games fetched.');
@@ -220,60 +231,6 @@ const testAddGames = async () => {
     console.error('Error during testAddGames:', error);
   }
 };
-
-// const testAddGames = async () => {
-//   const testIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-//   const gamesData = [];
-
-//   for (const gameId of testIds) {
-//     const gameData = await getGameById(gameId);
-//     if (gameData) {
-//       gamesData.push(gameData);
-//     } else {
-//       console.error(`Game with ID ${gameId} could not be fetched.`);
-//     }
-//   }
-
-//   if (gamesData.length > 0) {
-//     try {
-//       await addNewGamesToDatabase(gamesData);
-//       console.log('Test games added successfully.');
-//     } catch (error) {
-//       console.error('Error while adding games:', error);
-//     }
-//   } else {
-//     console.log('No games fetched to add.');
-//   }
-// };
-
-// const fetchAndAddGamesJob = new CronJob(
-//   '0 0 */10 * *', // Runs every 10 days at midnight
-//   async () => {
-//     console.log('Cron job started: Fetching new games...');
-
-//     try {
-//       // Fetch the new games (max 50 by default)
-//       const newGames = await fetchNewGames(50);
-
-//       if (newGames.length === 0) {
-//         console.log('No new games fetched.');
-//         return;
-//       }
-
-//       console.log(`Fetched ${newGames.length} games. Adding them to the database...`);
-
-//       // Add the fetched games to the database
-//       await addNewGamesToDatabase(newGames);
-
-//       console.log('Successfully added new games to the database.');
-//     } catch (error) {
-//       console.error('Error in the cron job while fetching or adding games:', error);
-//     }
-//   },
-//   null, // No "onComplete" callback
-//   true, // Start the job immediately
-//   'America/Los_Angeles' // Time zone
-// );
 
 export {
   getGameById,

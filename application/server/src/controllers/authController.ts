@@ -9,6 +9,12 @@ import jwt from 'jsonwebtoken';
 
 const userDataModel = new UserData();
 
+/**
+ * Controller: authStatus
+ * Description: Checks the user's authentication status based on the JWT token.
+ * @param req - The incoming HTTP request containing the JWT cookie.
+ * @param res - The outgoing HTTP response with the user's login status and ID.
+ */
 const authStatus = async (req: Request, res: Response) => {
   const token = req.cookies.jwt;
 
@@ -18,7 +24,6 @@ const authStatus = async (req: Request, res: Response) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-
     const user = await User.findById((decoded as any).userId);
 
     if (user) {
@@ -31,13 +36,20 @@ const authStatus = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Controller: registerUser
+ * Description: Registers a new user and initializes their associated user data.
+ * @param req - The incoming HTTP request containing user details.
+ * @param res - The outgoing HTTP response confirming the registration.
+ */
 const registerUser = async (req: Request, res: Response) => {
   const { name, email, password, profile_pic, theme_preference } = req.body;
 
-  // Use provided profile picture or default to the predefined path
+  // Use provided profile picture or default to a predefined path
   const profilePic = profile_pic || 'application/web/public/Default-Profile-Picture.jpg';
 
   try {
+    // Check for existing users by email or username
     const userExistsByEmail = await User.findByEmail(email);
     if (userExistsByEmail) {
       return res
@@ -52,6 +64,7 @@ const registerUser = async (req: Request, res: Response) => {
         .json({ message: 'This username is already taken' });
     }
 
+    // Create associated user data entry
     const userData: Omit<
       UserDataInterface,
       'id' | 'created_at' | 'updated_at'
@@ -64,15 +77,18 @@ const registerUser = async (req: Request, res: Response) => {
     };
 
     const userDataId = await userDataModel.createUserData(userData);
+
+    // Create the user
     const user: UserInterface = await User.create({
       name,
       email,
       password,
-      profile_pic: profilePic, // Assign the processed profile picture
-    theme_preference,
+      profile_pic: profilePic,
+      theme_preference,
       user_data_id: userDataId,
     });
 
+    // Generate JWT and return the user details
     const userIdStr = user.id.toString();
     generateToken(res, userIdStr);
 
@@ -80,8 +96,8 @@ const registerUser = async (req: Request, res: Response) => {
       id: userIdStr,
       name: user.name,
       email: user.email,
-      profile_pic: user.profile_pic, // Include profile_pic in the response
-    theme_preference: user.theme_preference,
+      profile_pic: user.profile_pic,
+      theme_preference: user.theme_preference,
       user_data_id: user.user_data_id,
     });
   } catch (error) {
@@ -90,7 +106,12 @@ const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-
+/**
+ * Controller: authenticateUser
+ * Description: Authenticates a user by email or username and password.
+ * @param req - The incoming HTTP request containing credentials.
+ * @param res - The outgoing HTTP response with authentication status.
+ */
 const authenticateUser = async (req: Request, res: Response) => {
   const { email, name, password } = req.body;
 
@@ -98,7 +119,6 @@ const authenticateUser = async (req: Request, res: Response) => {
     ? await User.findByEmail(email)
     : await User.findByUsername(name);
 
-  console.log('USER: ' + user);
   if (user && (await User.comparePassword(user.password, password))) {
     const userIdStr = user.id.toString();
     generateToken(res, userIdStr);
@@ -114,17 +134,32 @@ const authenticateUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Controller: logoutUser
+ * Description: Logs the user out by clearing the JWT token.
+ * @param req - The incoming HTTP request.
+ * @param res - The outgoing HTTP response confirming logout.
+ */
 const logoutUser = (req: Request, res: Response) => {
   clearToken(res);
   return res.status(200).json({ message: 'User logged out' });
 };
 
-// Google login initiation (redirects to Google)
+/**
+ * Controller: googleLogin
+ * Description: Initiates Google login by redirecting the user to the Google OAuth page.
+ */
 const googleLogin = passport.authenticate('google', {
   scope: ['profile', 'email'],
 });
 
-// Google login callback
+/**
+ * Controller: googleCallback
+ * Description: Handles the callback from Google OAuth login and generates a JWT.
+ * @param req - The incoming HTTP request.
+ * @param res - The outgoing HTTP response with user details and session token.
+ * @param next - The next middleware function in the Express pipeline.
+ */
 const googleCallback = (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate(
     'google',
@@ -137,8 +172,6 @@ const googleCallback = (req: Request, res: Response, next: NextFunction) => {
           .json({ message: 'Google authentication failed' });
       }
 
-      console.log('Authenticated user:', user);
-
       const token = generateToken(res, user.id.toString());
       res.cookie('jwt', token, {
         httpOnly: true,
@@ -146,7 +179,6 @@ const googleCallback = (req: Request, res: Response, next: NextFunction) => {
         maxAge: 60 * 60 * 1000, // 1 hour
       });
 
-      // Send user details in response
       res.status(200).json({
         id: user.id,
         name: user.name,

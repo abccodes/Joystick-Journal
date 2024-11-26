@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rate My Video Game</title>
+    <title>Sign Up - Rate My Video Game</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Header Section -->
     <header class="banner">
       <div class="banner-picture"></div>
       <div class="banner-content">
+        <!-- App Title -->
         <h1 class="title">
           <a href="index.html" class="title-link">Rate My Video Game</a>
         </h1>
@@ -19,44 +21,55 @@
         </div>
       </div>
     </header>
+
+    <!-- Main Content Section -->
     <section class="content-section">
       <div class="signup-form">
+        <!-- Signup Header -->
         <h2>Create an Account</h2>
+
+        <!-- Google Login Button -->
         <div class="google-login-container">
-          <button class="google-login-btn " id="google-login-button">
+          <button class="google-login-btn" id="google-login-button">
             <img src="google.png" alt="Google Icon" /> Continue with Google
           </button>
         </div>
 
+        <!-- Signup Form -->
         <form id="signup-form">
           <input
             type="text"
             name="username"
             placeholder="Username"
             class="input-field"
+            required
           />
           <input
             type="email"
             name="email"
             placeholder="Email"
             class="input-field"
+            required
           />
           <input
             type="password"
             name="password"
             placeholder="Password"
             class="input-field"
+            required
           />
           <input
             type="password"
             name="confirm_password"
             placeholder="Confirm Password"
             class="input-field"
+            required
           />
           <button type="submit" class="signup-btn">Create</button>
         </form>
       </div>
 
+      <!-- Footer Section -->
       <footer>
         <ul class="footer-links">
           <li><a href="#">Ad Choices</a></li>
@@ -65,7 +78,93 @@
         </ul>
       </footer>
     </section>
-    <script src="script.js"></script>
-    <!-- jason added this for js -->
+
+    <script>
+      // Ensure script runs after the page content is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        const signupForm = document.getElementById('signup-form');
+
+        // Handle form submission
+        signupForm.addEventListener('submit', async (e) => {
+          e.preventDefault(); // Prevent default form submission
+
+          // Extract form values
+          const username = signupForm.username.value.trim();
+          const email = signupForm.email.value.trim();
+          const password = signupForm.password.value.trim();
+          const confirmPassword = signupForm.confirm_password.value.trim();
+
+          // Validate fields
+          if (!username || !email || !password || !confirmPassword) {
+            alert('Please fill out all fields.');
+            return;
+          }
+          if (password !== confirmPassword) {
+            alert('Passwords do not match.');
+            return;
+          }
+
+          try {
+            const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                name: username,
+                email,
+                password,
+              }),
+            });
+
+            if (response.ok) {
+              alert('Account created successfully! Redirecting to login...');
+              window.location.href = 'login.html';
+            } else {
+              const errorData = await response.json();
+              alert(`Sign up failed: ${errorData.message || 'Unknown error'}`);
+            }
+          } catch (error) {
+            console.error('Error during sign-up:', error);
+            alert('An error occurred. Please try again later.');
+          }
+        });
+
+        // Google Login Button Integration
+        const googleLoginButton = document.getElementById('google-login-button');
+        googleLoginButton.addEventListener('click', () => {
+          window.location.href = 'http://127.0.0.1:8000/api/auth/google';
+        });
+      });
+    </script>
   </body>
 </html>
+
+<!-- Key Improvements:
+Backend API Integration:
+
+Added an API call to http://127.0.0.1:8000/api/auth/register to handle user registration.
+Provided validation and error handling for server responses.
+Form Validation:
+
+Added required attributes to ensure users cannot submit empty fields.
+Included a check to ensure password and confirm password match before making the API call.
+User Feedback:
+
+Alert messages inform users about the success or failure of their registration.
+Redirects users to login.html upon successful account creation.
+Google Login Integration:
+
+Redirects users to the backend's /api/auth/google endpoint for Google OAuth login.
+Professional Comments:
+
+Detailed comments clarify each section for easier maintenance and future updates.
+
+
+User Flow:
+Users fill out all fields in the form.
+If all validations pass, the form sends a POST request to the backend API.
+Users receive feedback:
+Successful registration: Redirects to the login page.
+Failed registration: Displays an error message.
+Users can use the Google login button to authenticate via OAuth. -->

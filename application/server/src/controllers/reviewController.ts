@@ -4,6 +4,12 @@ import { verifyOwnership } from './helper/auth';
 
 const reviewModel = new ReviewModel();
 
+/**
+ * Controller: createReview
+ * Description: Creates a new review for a game.
+ * @param req - The incoming HTTP request containing review details in the body.
+ * @param res - The outgoing HTTP response with the newly created review ID.
+ */
 export const createReview = async (
   req: Request,
   res: Response
@@ -39,6 +45,12 @@ export const createReview = async (
   }
 };
 
+/**
+ * Controller: getReviewById
+ * Description: Fetches a single review by its ID.
+ * @param req - The incoming HTTP request containing the review ID in params.
+ * @param res - The outgoing HTTP response containing the review data.
+ */
 export const getReviewById = async (
   req: Request,
   res: Response
@@ -58,6 +70,12 @@ export const getReviewById = async (
   }
 };
 
+/**
+ * Controller: getReviewByGameId
+ * Description: Fetches all reviews for a specific game by its game ID.
+ * @param req - The incoming HTTP request containing the game ID in params.
+ * @param res - The outgoing HTTP response containing an array of reviews.
+ */
 export const getReviewByGameId = async (
   req: Request,
   res: Response
@@ -77,6 +95,12 @@ export const getReviewByGameId = async (
   }
 };
 
+/**
+ * Controller: updateReview
+ * Description: Updates a review by its ID after verifying ownership.
+ * @param req - The incoming HTTP request containing review ID in params and updates in the body.
+ * @param res - The outgoing HTTP response confirming the update.
+ */
 export const updateReview = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -90,7 +114,7 @@ export const updateReview = async (req: Request, res: Response) => {
 
     if (!verifyOwnership(req, res, review.user_id)) return;
 
-    await reviewModel.updateReview(Number(id), req.body);
+    await reviewModel.updateReview(reviewId, req.body);
     res.status(200).json({ message: 'Review updated successfully' });
   } catch (err) {
     console.error('Error updating review:', err);
@@ -98,6 +122,12 @@ export const updateReview = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Controller: deleteReview
+ * Description: Deletes a review by its ID after verifying ownership.
+ * @param req - The incoming HTTP request containing review ID in params.
+ * @param res - The outgoing HTTP response confirming the deletion.
+ */
 export const deleteReview = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -111,7 +141,7 @@ export const deleteReview = async (req: Request, res: Response) => {
 
     if (!verifyOwnership(req, res, review.user_id)) return;
 
-    await reviewModel.deleteReview(Number(id));
+    await reviewModel.deleteReview(reviewId);
     res.status(200).json({ message: 'Review deleted successfully' });
   } catch (err) {
     console.error('Error deleting review:', err);

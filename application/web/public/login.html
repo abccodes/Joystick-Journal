@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rate My Video Game</title>
+    <title>Rate My Video Game - Login</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Header Section -->
     <header class="banner">
       <div class="banner-picture"></div>
       <div class="banner-content">
+        <!-- App Title -->
         <h1 class="title">
           <a href="index.html" class="title-link">Rate My Video Game</a>
         </h1>
@@ -19,39 +21,46 @@
         </div>
       </div>
     </header>
+
+    <!-- Main Login Section -->
     <section class="content-section">
       <div class="login-box">
+        <!-- Login Header -->
         <h2>Login</h2>
         <p>
-          Want to create an account?
-          <a href="signup.html" class="create-account-link"
-            >Create an Account</a
-          >
+          Don't have an account?
+          <a href="signup.html" class="create-account-link">Create an Account</a>
         </p>
+
+        <!-- Google Login Button -->
         <div class="google-login-container">
           <button class="google-login-btn" id="google-login-button">
             <img src="google.png" alt="Google Icon" /> Continue with Google
           </button>
         </div>
 
-        <form class="login-form">
+        <!-- Login Form -->
+        <form class="login-form" id="login-form">
           <input
-            type="text"
+            type="email"
             name="email"
             placeholder="Email"
             class="input-field"
+            required
           />
           <input
             type="password"
             name="password"
             placeholder="Password"
             class="input-field password-field"
+            required
           />
           <a href="#" class="forgot-password">Forgot Password?</a>
           <button type="submit" class="submit-btn">Sign In</button>
         </form>
       </div>
 
+      <!-- Footer Section -->
       <footer>
         <ul class="footer-links">
           <li><a href="#">Ad Choices</a></li>
@@ -61,7 +70,73 @@
       </footer>
     </section>
 
-    <script src="script.js"></script>
-    <!-- jason added this for js -->
+    <script>
+      // DOMContentLoaded ensures the script runs after the page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('login-form');
+
+        // Handle form submission
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault(); // Prevent default form submission
+
+          const email = loginForm.email.value.trim();
+          const password = loginForm.password.value.trim();
+
+          if (!email || !password) {
+            alert('Please fill out both fields.');
+            return;
+          }
+
+          try {
+            const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              alert('Login successful!');
+              // Redirect to the home page or user dashboard
+              window.location.href = 'index.html';
+            } else {
+              const errorData = await response.json();
+              alert(`Login failed: ${errorData.message || 'Unknown error'}`);
+            }
+          } catch (error) {
+            console.error('Error during login:', error);
+            alert('An error occurred. Please try again later.');
+          }
+        });
+
+        // Google Login Button (Optional integration placeholder)
+        const googleLoginButton = document.getElementById('google-login-button');
+        googleLoginButton.addEventListener('click', () => {
+          window.location.href = 'http://127.0.0.1:8000/api/auth/google';
+        });
+      });
+    </script>
   </body>
 </html>
+
+<!-- Key Improvements:
+Backend Integration:
+
+Added an API call to http://127.0.0.1:8000/api/auth/login for user authentication.
+Included handling for server responses, including success and failure scenarios.
+Form Validation:
+
+Added required attributes to ensure the user cannot submit the form with empty fields.
+Displayed an alert for missing fields before making the API call.
+Improved User Feedback:
+
+Alerts for successful or failed login attempts.
+Redirects users to index.html upon successful login.
+Google Login Integration:
+
+Redirects users to the backend's /api/auth/google endpoint for Google OAuth login.
+Professional Comments:
+
+Added clear comments for each major section to guide developers during maintenance or updates. -->

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Search</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="banner">
+    <div class="banner-picture"></div>
+    <div class="banner-content">
+      <h1 class="title">
+        <a href="index.html" class="title-link">Rate My Video Game</a>
+      </h1>
+      <div class="buttons">
+        <a href="signup.html" class="pill-button">Sign Up</a>
+        <a href="login.html" class="pill-button">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Advanced Search Form -->
+  <section class="content-section">
+    <h2>Advanced Search</h2>
+    <form id="advanced-search-form" class="search-form">
+      <div class="search-bar">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search for a video game"
+          name="query"
+        />
+      </div>
+      <div class="filters">
+        <label for="genre">Genre:</label>
+        <select id="genre" name="genre" class="pill-dropdown">
+          <option value="">Select Genre</option>
+          <option value="action">Action</option>
+          <option value="rpg">RPG</option>
+          <option value="puzzle">Puzzle</option>
+          <option value="sports">Sports</option>
+        </select>
+
+        <label for="rating">Minimum Rating:</label>
+        <select id="rating" name="rating" class="pill-dropdown">
+          <option value="">Select Rating</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+      <button type="submit" class="search-button">Search</button>
+    </form>
+
+    <div id="search-results" class="grid"></div>
+  </section>
+
+  <footer>
+    <ul class="footer-links">
+      <li><a href="#">Ad Choices</a></li>
+      <li><a href="terms-and-conditions.html">Terms & Conditions</a></li>
+      <li><a href="privacy-policy.html">Privacy Policy</a></li>
+    </ul>
+  </footer>
+  <script src="script.js"></script>
+  <script src="advanced-search.js"></script>
+</body>
+</html>
