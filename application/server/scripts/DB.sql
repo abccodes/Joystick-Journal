@@ -116,3 +116,4 @@ INSERT INTO reviews (user_id, game_id, rating, review_text) VALUES
     (8, 8, 4, 'Fun shooter with unique heroes.'),
     (9, 9, 2, 'Expected more, some bugs.'),
     (10, 10, 5, 'Relaxing and fun farming game.');
+

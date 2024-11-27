@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import { getPool } from '../connections/database';
 import {
   registerUser,
   authenticateUser,
@@ -82,5 +83,40 @@ router.get(
  * - 500: Internal server error during Google callback processing.
  */
 router.get('/google/callback', googleCallback);
+
+/**
+ * Route: POST /api/auth/forgot-password
+ * Description: Handle password reset email requests.
+ * Request Body:
+ * - email: The email address of the user requesting a password reset.
+ * Response:
+ * - 200: Password reset email sent successfully.
+ * - 400: Missing or invalid email.
+ * - 500: Internal server error.
+ */
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required.' });
+  }
+
+  try {
+    const pool = getPool();
+    const [user] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+
+    if (user.length === 0) {
+      return res.status(404).json({ message: 'No account found with this email.' });
+    }
+
+    // Simulate sending a password reset email
+    console.log(`Password reset link sent to ${email}`);
+
+    res.status(200).json({ message: 'Password reset email sent.' });
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    res.status(500).json({ message: 'Server error. Please try again later.' });
+  }
+});
+
 
 export default router;

@@ -2,12 +2,20 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Extract `gameId` from the URL parameters
   const gameId = new URLSearchParams(window.location.search).get('gameId');
-  
+
   if (gameId) {
     // Fetch and display game data
     try {
       const response = await fetch(`http://127.0.0.1:8000/api/games/${gameId}`);
-      if (!response.ok) throw new Error(`Failed to fetch game data: ${response.statusText}`);
+      
+      // Handle non-2xx HTTP responses
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Game not found');
+        }
+        throw new Error(`Failed to fetch game data: ${response.statusText}`);
+      }
+
       const gameData = await response.json();
 
       // Update game info section with fetched data
@@ -22,12 +30,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } catch (error) {
       console.error('Error fetching game data:', error);
+
+      // Handle error by updating the game info section with a fallback message
+      const gameTitle = document.getElementById('game-title');
+      gameTitle.textContent = 'Game not found.';
     }
 
     // Fetch and display reviews for the game
     try {
       const reviewsResponse = await fetch(`http://127.0.0.1:8000/api/reviews/game/${gameId}`);
+      
+      // Handle non-2xx HTTP responses
       if (!reviewsResponse.ok) throw new Error(`Failed to fetch reviews: ${reviewsResponse.statusText}`);
+      
       const reviewsData = await reviewsResponse.json();
 
       // Check if reviews data exists
@@ -61,10 +76,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } else {
     console.warn('No gameId found in URL parameters.');
+
+    // Update the game title with a warning message for missing or invalid gameId
     const gameTitle = document.getElementById('game-title');
     gameTitle.innerText = 'Game ID is missing or invalid.';
   }
 });
+
 
 // Key Improvements:
 // Error Handling:

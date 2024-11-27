@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const gameGrid = document.getElementById('gameGrid');
   const recommendationButton = document.getElementById('recommendation-button');
   const googleLoginButton = document.getElementById('google-login-button');
+  const forgotPasswordForm = document.getElementById('forgot-password-form');
 
   /**
    * Helper function to make fetch calls with error handling.
@@ -67,6 +68,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Could not check authentication status.');
     }
   };
+
+  /**
+   * Handle forgot password form submission.
+   * Sends the user's email to the backend to trigger a password reset email.
+   */
+  if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = forgotPasswordForm.email.value;
+
+      try {
+        const response = await fetchWithErrorHandling('http://127.0.0.1:8000/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        alert(response.message); // Success message from the backend
+      } catch (error) {
+        console.error('Password reset failed:', error);
+      }
+    });
+  }
 
   /**
    * Handle login form submission.
@@ -128,44 +151,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  /**
-   * Fetch and display game recommendations.
-   * Fetches recommendations for the logged-in user and displays them in the UI.
-   */
-  const fetchRecommendations = async () => {
-    const recommendationsDiv = document.getElementById('recommendations');
-    recommendationsDiv.innerHTML = ''; // Clear previous content
-
-    try {
-      const recommendations = await fetchWithErrorHandling(
-        'http://127.0.0.1:8000/api/userdata/recommendations',
-        { credentials: 'include' }
-      );
-
-      if (recommendations.length === 0) {
-        recommendationsDiv.innerHTML = '<p>No recommendations available.</p>';
-        return;
-      }
-
-      recommendations.forEach((game) => {
-        const gameElement = document.createElement('div');
-        gameElement.classList.add('game-tile');
-        gameElement.innerHTML = `
-          <h3>${game.title}</h3>
-          <p>Genre: ${game.genre}</p>
-          <p>Rating: ${game.review_rating}</p>
-        `;
-        recommendationsDiv.appendChild(gameElement);
-      });
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
-      recommendationsDiv.innerHTML = '<p>Failed to load recommendations.</p>';
-    }
-  };
-
   // Add event listener for recommendations button
   if (recommendationButton) {
-    recommendationButton.addEventListener('click', fetchRecommendations);
+    recommendationButton.addEventListener('click', async () => {
+      const recommendationsDiv = document.getElementById('recommendations');
+      recommendationsDiv.innerHTML = ''; // Clear previous content
+
+      try {
+        const response = await fetchWithErrorHandling('http://127.0.0.1:8000/api/userdata/recommendations', {
+          credentials: 'include',
+        });
+
+        if (response.recommendations.length === 0) {
+          recommendationsDiv.innerHTML = '<p>No recommendations available.</p>';
+        } else {
+          response.recommendations.forEach((game) => {
+            const gameContainer = document.createElement('div');
+            gameContainer.classList.add('game-tile');
+            gameContainer.innerHTML = `
+              <h3>${game.title}</h3>
+              <p>Genre: ${game.genre}</p>
+              <p>Rating: ${game.review_rating}</p>
+            `;
+            recommendationsDiv.appendChild(gameContainer);
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        recommendationsDiv.innerHTML = '<p>Failed to load recommendations.</p>';
+      }
+    });
   }
 
   // Add event listener for Google Login button
