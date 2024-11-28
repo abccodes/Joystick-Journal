@@ -9,9 +9,8 @@ class UserData {
    * @param data - The user data object.
    * @returns An object with array fields stringified.
    */
-  private stringifyFields(data: UserDataInterface): any {
+  private stringifyFields(data: UserDataInterface): Record<string, string> {
     return {
-      ...data,
       search_history: JSON.stringify(data.search_history || []),
       interests: JSON.stringify(data.interests || []),
       view_history: JSON.stringify(data.view_history || []),
@@ -27,26 +26,21 @@ class UserData {
    * @returns A user data object with parsed fields.
    */
   private parseFields(row: any): UserDataInterface {
+    const safeParse = (field: any) => {
+      try {
+        return typeof field === 'string' ? JSON.parse(field) : [];
+      } catch {
+        return [];
+      }
+    };
+
     return {
       ...row,
-      search_history:
-        typeof row.search_history === 'string'
-          ? JSON.parse(row.search_history)
-          : row.search_history,
-      interests:
-        typeof row.interests === 'string'
-          ? JSON.parse(row.interests)
-          : row.interests,
-      view_history:
-        typeof row.view_history === 'string'
-          ? JSON.parse(row.view_history)
-          : row.view_history,
-      review_history:
-        typeof row.review_history === 'string'
-          ? JSON.parse(row.review_history)
-          : row.review_history,
-      genres:
-        typeof row.genres === 'string' ? JSON.parse(row.genres) : row.genres,
+      search_history: safeParse(row.search_history),
+      interests: safeParse(row.interests),
+      view_history: safeParse(row.view_history),
+      review_history: safeParse(row.review_history),
+      genres: safeParse(row.genres),
     };
   }
 
@@ -60,21 +54,25 @@ class UserData {
     userData: Omit<UserDataInterface, 'id' | 'created_at' | 'updated_at'>
   ): Promise<number> {
     const pool = getPool();
+    const stringifiedData = this.stringifyFields(userData);
 
-    // Insert user data into the database
-    const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO user_data (search_history, interests, view_history, review_history, genres) VALUES (?, ?, ?, ?, ?)',
-      [
-        JSON.stringify(userData.search_history || []),
-        JSON.stringify(userData.interests || []),
-        JSON.stringify(userData.view_history || []),
-        JSON.stringify(userData.review_history || []),
-        JSON.stringify(userData.genres || []),
-      ]
-    );
+    try {
+      const [result] = await pool.query<ResultSetHeader>(
+        'INSERT INTO user_data (search_history, interests, view_history, review_history, genres) VALUES (?, ?, ?, ?, ?)',
+        [
+          stringifiedData.search_history,
+          stringifiedData.interests,
+          stringifiedData.view_history,
+          stringifiedData.review_history,
+          stringifiedData.genres,
+        ]
+      );
 
-    // Return the ID of the newly created entry
-    return result.insertId;
+      return result.insertId; // Return the ID of the newly created entry
+    } catch (error) {
+      console.error('Error creating user data:', error);
+      throw new Error('Database error occurred while creating user data.');
+    }
   }
 
   /**
@@ -86,8 +84,14 @@ class UserData {
   async getUserDataById(id: number): Promise<UserDataInterface | null> {
     const pool = getPool();
     const sql = 'SELECT * FROM user_data WHERE id = ?';
-    const [rows] = await pool.query<RowDataPacket[]>(sql, [id]);
-    return rows.length ? this.parseFields(rows[0]) : null;
+
+    try {
+      const [rows] = await pool.query<RowDataPacket[]>(sql, [id]);
+      return rows.length ? this.parseFields(rows[0]) : null;
+    } catch (error) {
+      console.error(`Error fetching user data with ID ${id}:`, error);
+      return null;
+    }
   }
 
   /**
@@ -106,7 +110,6 @@ class UserData {
     const fields = [];
     const values: (string | number)[] = [];
 
-    // Build the SQL update query dynamically
     for (const [key, value] of Object.entries(stringifiedUpdates)) {
       fields.push(`${key} = ?`);
       values.push(value as string | number);
@@ -114,7 +117,13 @@ class UserData {
 
     values.push(id);
     const sql = `UPDATE user_data SET ${fields.join(', ')} WHERE id = ?`;
-    await pool.query(sql, values);
+
+    try {
+      await pool.query(sql, values);
+    } catch (error) {
+      console.error(`Error updating user data with ID ${id}:`, error);
+      throw new Error('Database error occurred while updating user data.');
+    }
   }
 
   /**
@@ -126,9 +135,14 @@ class UserData {
   async deleteUserData(id: number): Promise<void> {
     const pool = getPool();
     const sql = 'DELETE FROM user_data WHERE id = ?';
-    await pool.query(sql, [id]);
+
+    try {
+      await pool.query(sql, [id]);
+    } catch (error) {
+      console.error(`Error deleting user data with ID ${id}:`, error);
+      throw new Error('Database error occurred while deleting user data.');
+    }
   }
 }
 
 export default UserData;
-

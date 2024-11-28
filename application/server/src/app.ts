@@ -1,9 +1,6 @@
-// app.ts
-
 import express from 'express';
 import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { connectUserDB } from './connections/database';
+import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -18,6 +15,7 @@ import userRouter from './routes/userRoutes';
 import gameRouter from './routes/gameRoutes';
 import reviewRouter from './routes/reviewRoutes';
 import recommendations from './routes/recommendationRoutes';
+import { getPool } from './connections/database';
 
 dotenv.config();
 
@@ -90,9 +88,16 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // Ensure GOOGLE_CLIENT_SECRET exists in .env
       callbackURL: '/api/auth/google/callback', // This route must match the authRouter configuration
     },
-    (accessToken, refreshToken, profile, done) => {
-      // For now, we'll just pass the profile along
-      return done(null, profile);
+    (accessToken, refreshToken, profile: Profile, done) => {
+      // Map profile to a User-compatible object
+      const user = {
+        id: Number(profile.id), // Convert string ID to number
+        name: profile.displayName,
+        email: profile.emails?.[0]?.value || '', // Use the first email if available
+        profile_pic: profile.photos?.[0]?.value || null, // Use the first profile picture if available
+      };
+
+      return done(null, user);
     }
   )
 );
@@ -128,8 +133,13 @@ app.get('/', (req, res) => {
 
 /**
  * Database Connection
- * Description: Initializes the user database connection. Consider removing if unused in favor of `getPool`.
+ * Description: Test the connection pool initialization using `getPool`.
  */
-connectUserDB();
+try {
+  const pool = getPool(); // Initialize the connection pool
+  console.log('Database connection pool initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize database connection pool:', error);
+}
 
 export default app;

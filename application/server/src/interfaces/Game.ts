@@ -1,54 +1,82 @@
 /**
- * Interface: User
- * Description: Represents a user in the application, including their personal details, preferences, and associated metadata.
+ * Interface: Game
+ * Description: Represents a game in the application, including metadata and descriptive details.
  */
-export interface User {
+export interface Game {
   /**
-   * The unique identifier for the user.
+   * The unique identifier for the game.
    */
-  id: number;
+  game_id?: number;
 
   /**
-   * The user's full name.
+   * The title of the game.
    */
-  name: string;
+  title: string;
 
   /**
-   * The user's email address.
+   * A description of the game.
    */
-  email: string;
+  description: string;
 
   /**
-   * The hashed password of the user.
-   * This is stored securely and not directly accessible in plaintext.
+   * The genre of the game.
    */
-  password: string;
+  genre: string;
 
   /**
-   * The URL of the user's profile picture.
-   * Null if the user has not uploaded a profile picture.
+   * Tags associated with the game.
+   * Stored as an array of strings in code and serialized to JSON in the database.
    */
-  profile_pic: string | null;
+  tags: string[];
 
   /**
-   * The user's theme preference.
-   * Can be either 'light' or 'dark'.
+   * Platforms on which the game is available.
+   * Stored as an array of strings in code and serialized to JSON in the database.
    */
-  theme_preference: 'light' | 'dark';
+  platforms: string[];
 
   /**
-   * The foreign key linking this user to their user data entry.
-   * Null if no associated user data exists.
+   * Estimated playtime for the game in hours.
    */
-  user_data_id: number | null;
+  playtime_estimate: number;
 
   /**
-   * The timestamp when the user was created.
+   * The developer of the game.
    */
-  created_at: Date;
+  developer: string;
 
   /**
-   * The timestamp when the user was last updated.
+   * The publisher of the game.
    */
-  updated_at: Date;
+  publisher: string;
+
+  /**
+   * The mode of gameplay (e.g., single-player, multiplayer).
+   */
+  game_mode: string;
+
+  /**
+   * The release date of the game.
+   */
+  release_date: Date | string;
+
+  /**
+   * The average review rating for the game.
+   */
+  review_rating: number;
+
+  /**
+   * The URL or path to the cover image of the game.
+   */
+  cover_image: string;
+
+  /**
+   * The timestamp when the game was created.
+   */
+  created_at?: Date;
+
+  /**
+   * The timestamp when the game was last updated.
+   */
+  updated_at?: Date;
 }

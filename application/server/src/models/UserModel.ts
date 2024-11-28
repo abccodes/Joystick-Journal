@@ -1,20 +1,9 @@
 import bcrypt from 'bcryptjs';
 import { getPool } from '../connections/database';
-import { RowDataPacket } from 'mysql2/promise';
+import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { User as UserInterface } from '../interfaces/User';
 
 class User {
-  /**
-   * Method: updateProfilePicture
-   * Description: Placeholder method for updating a user's profile picture.
-   * Throws an error if called, as it's not yet implemented.
-   * @param id - The ID of the user.
-   * @param profilePicUrl - The URL of the new profile picture.
-   */
-  static updateProfilePicture(id: number, profilePicUrl: string) {
-    throw new Error('Method not implemented.');
-  }
-
   /**
    * Method: create
    * Description: Creates a new user in the database.
@@ -32,19 +21,25 @@ class User {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insert the user into the database
-    await pool.query(
-      'INSERT INTO users (name, email, password, profile_pic, theme_preference, user_data_id) VALUES (?, ?, ?, ?, ?, ?)',
+    const [result] = await pool.query<ResultSetHeader>(
+      `
+      INSERT INTO users (name, email, password, profile_pic, theme_preference, user_data_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `,
       [name, email, hashedPassword, profile_pic, theme_preference, user_data_id]
     );
 
+    if (!result.insertId) {
+      throw new Error('Failed to create user. No insert ID returned.');
+    }
+
     // Retrieve the newly created user
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
+      'SELECT * FROM users WHERE id = ?',
+      [result.insertId]
     );
 
-    const userRow = rows[0] as UserInterface;
-    return userRow;
+    return rows[0] as UserInterface;
   }
 
   /**
@@ -59,8 +54,8 @@ class User {
       'SELECT * FROM users WHERE email = ?',
       [email]
     );
-    const userRow = rows[0] as UserInterface;
-    return userRow || undefined;
+
+    return rows[0] as UserInterface || undefined;
   }
 
   /**
@@ -91,8 +86,8 @@ class User {
       'SELECT * FROM users WHERE name = ?',
       [username]
     );
-    const userRow = rows[0] as UserInterface;
-    return userRow || undefined;
+
+    return rows[0] as UserInterface || undefined;
   }
 
   /**
@@ -107,8 +102,8 @@ class User {
       'SELECT * FROM users WHERE id = ?',
       [userId]
     );
-    const userRow = rows[0] as UserInterface;
-    return userRow || undefined;
+
+    return rows[0] as UserInterface || undefined;
   }
 
   /**
@@ -123,14 +118,12 @@ class User {
     profilePicUrl: string
   ): Promise<boolean> {
     const pool = getPool();
-    const [result] = await pool.query(
+    const [result] = await pool.query<ResultSetHeader>(
       'UPDATE users SET profile_pic = ? WHERE id = ?',
       [profilePicUrl, userId]
     );
 
-    // Check if any row was updated
-    const updateResult = result as { affectedRows: number };
-    return updateResult.affectedRows > 0;
+    return result.affectedRows > 0;
   }
 }
 

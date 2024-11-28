@@ -1,54 +1,40 @@
 /**
- * Interface: User
- * Description: Represents a user in the application, including their personal details, preferences, and associated metadata.
+ * Interface: Review
+ * Description: Represents a review in the application, including the user ID, game ID, and review details.
  */
-export interface User {
+export interface Review {
   /**
-   * The unique identifier for the user.
+   * The unique identifier for the review.
    */
-  id: number;
+  review_id: number;
 
   /**
-   * The user's full name.
+   * The ID of the user who created the review.
    */
-  name: string;
+  user_id: number;
 
   /**
-   * The user's email address.
+   * The ID of the game being reviewed.
    */
-  email: string;
+  game_id: number;
 
   /**
-   * The hashed password of the user.
-   * This is stored securely and not directly accessible in plaintext.
+   * The rating given by the user (e.g., 1-5 stars).
    */
-  password: string;
+  rating: number;
 
   /**
-   * The URL of the user's profile picture.
-   * Null if the user has not uploaded a profile picture.
+   * The text content of the review.
    */
-  profile_pic: string | null;
+  review_text: string;
 
   /**
-   * The user's theme preference.
-   * Can be either 'light' or 'dark'.
-   */
-  theme_preference: 'light' | 'dark';
-
-  /**
-   * The foreign key linking this user to their user data entry.
-   * Null if no associated user data exists.
-   */
-  user_data_id: number | null;
-
-  /**
-   * The timestamp when the user was created.
+   * The timestamp when the review was created.
    */
   created_at: Date;
 
   /**
-   * The timestamp when the user was last updated.
+   * The timestamp when the review was last updated.
    */
   updated_at: Date;
 }
