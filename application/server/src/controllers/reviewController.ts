@@ -9,6 +9,10 @@ export const createReview = async (
   res: Response
 ): Promise<Response> => {
   try {
+
+    //commented out to test posting reviews without auth
+
+    /**
     const { id } = req.params;
 
     if (!id) {
@@ -17,6 +21,10 @@ export const createReview = async (
         .json({ message: 'Unauthorized: Please sign in to create a review' });
     }
 
+    **/ 
+    
+    const user_id = 1; // Hardcoded for testing
+
     const { game_id, rating, review_text } = req.body;
 
     if (!game_id || !rating || !review_text) {
@@ -24,7 +32,8 @@ export const createReview = async (
     }
 
     const reviewId = await reviewModel.createReview({
-      user_id: Number(id),
+      //user_id: Number(id),
+      user_id: 1,
       game_id,
       rating,
       review_text,
