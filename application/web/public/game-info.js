@@ -8,17 +8,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const response = await fetch(`http://127.0.0.1:8000/api/games/${gameId}`);
       
-      // Handle non-2xx HTTP responses
       if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Game not found');
-        }
+        if (response.status === 404) throw new Error('Game not found');
         throw new Error(`Failed to fetch game data: ${response.statusText}`);
       }
 
       const gameData = await response.json();
 
-      // Update game info section with fetched data
       const gameTitle = document.getElementById('game-title');
       const gameRating = document.getElementById('game-rating');
       const gameReleaseDate = document.getElementById('game-release-date');
@@ -30,76 +26,89 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } catch (error) {
       console.error('Error fetching game data:', error);
-
-      // Handle error by updating the game info section with a fallback message
       const gameTitle = document.getElementById('game-title');
       gameTitle.textContent = 'Game not found.';
     }
 
     // Fetch and display reviews for the game
-    try {
-      const reviewsResponse = await fetch(`http://127.0.0.1:8000/api/reviews/game/${gameId}`);
-      
-      // Handle non-2xx HTTP responses
-      if (!reviewsResponse.ok) throw new Error(`Failed to fetch reviews: ${reviewsResponse.statusText}`);
-      
-      const reviewsData = await reviewsResponse.json();
+    const loadReviews = async () => {
+      try {
+        const reviewsResponse = await fetch(`http://127.0.0.1:8000/api/reviews/game/${gameId}`);
+        if (!reviewsResponse.ok) throw new Error(`Failed to fetch reviews: ${reviewsResponse.statusText}`);
+        
+        const reviewsData = await reviewsResponse.json();
+        const reviewsContainer = document.getElementById('reviews-container');
+        reviewsContainer.innerHTML = '';
 
-      // Check if reviews data exists
-      const reviewsContainer = document.getElementById('reviews-container');
-      reviewsContainer.innerHTML = ''; // Clear existing reviews
-
-      if (Array.isArray(reviewsData) && reviewsData.length > 0) {
-        reviewsData.forEach(review => {
-          // Create a review element
-          const reviewElement = document.createElement('div');
-          reviewElement.classList.add('review-box'); // Add class for styling
-
-          // Populate review element with review data
-          reviewElement.innerHTML = `
-            <strong>User ID:</strong> ${review.user_id || 'Unknown'} <br>
-            <strong>Rating:</strong> ${review.rating || 'No Rating'} <br>
-            <strong>Review:</strong> ${review.review_text || 'No Review Text'} <br>
-            <small><strong>Created At:</strong> ${review.created_at || 'N/A'}</small>
-          `;
-
-          // Append review element to the container
-          reviewsContainer.appendChild(reviewElement);
-        });
-      } else {
-        reviewsContainer.innerHTML = '<p>No reviews available for this game.</p>';
+        if (Array.isArray(reviewsData) && reviewsData.length > 0) {
+          reviewsData.forEach(review => {
+            const reviewElement = document.createElement('div');
+            reviewElement.classList.add('review-box');
+            reviewElement.innerHTML = `
+              <strong>User ID:</strong> ${review.user_id || 'Unknown'} <br>
+              <strong>Rating:</strong> ${review.rating || 'No Rating'} <br>
+              <strong>Review:</strong> ${review.review_text || 'No Review Text'} <br>
+              <small><strong>Created At:</strong> ${review.created_at || 'N/A'}</small>
+            `;
+            reviewsContainer.appendChild(reviewElement);
+          });
+        } else {
+          reviewsContainer.innerHTML = '<p>No reviews available for this game.</p>';
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        const reviewsContainer = document.getElementById('reviews-container');
+        reviewsContainer.innerHTML = '<p>Failed to load reviews.</p>';
       }
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
-      const reviewsContainer = document.getElementById('reviews-container');
-      reviewsContainer.innerHTML = '<p>Failed to load reviews.</p>';
-    }
+    };
+
+    await loadReviews();
+
+    // Handle "Create Review" button click to toggle form visibility
+    const createReviewBtn = document.getElementById('create-review-btn');
+    const createReviewForm = document.getElementById('create-review-form');
+
+    createReviewBtn.addEventListener('click', () => {
+      createReviewForm.classList.toggle('hidden');
+    });
+
+    // Handle review form submission
+    createReviewForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const rating = document.getElementById('rating').value;
+      const reviewText = document.getElementById('review_text').value;
+
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            game_id: gameId,
+            rating,
+            review_text: reviewText,
+          }),
+        });
+
+        if (response.ok) {
+          alert('Review submitted successfully!');
+          createReviewForm.reset();
+          createReviewForm.classList.add('hidden');
+          await loadReviews();
+        } else {
+          const errorData = await response.json();
+          alert(`Failed to submit review: ${errorData.message || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.error('Error submitting review:', error);
+        alert('An error occurred while submitting your review. Please try again later.');
+      }
+    });
   } else {
     console.warn('No gameId found in URL parameters.');
-
-    // Update the game title with a warning message for missing or invalid gameId
     const gameTitle = document.getElementById('game-title');
     gameTitle.innerText = 'Game ID is missing or invalid.';
   }
 });
-
-
-// Key Improvements:
-// Error Handling:
-
-// Added checks for HTTP response status (response.ok) and logged descriptive errors.
-// Displayed fallback messages in the UI if fetching data fails.
-// Dynamic Data Updates:
-
-// Used innerText and innerHTML with appropriate null/undefined checks to avoid breaking the UI.
-// Added fallback content (N/A) for missing data fields.
-// Improved Comments:
-
-// Detailed comments for each section of the script to explain its purpose and functionality.
-// Resilience Against Missing or Invalid Data:
-
-// Added warnings if gameId is missing.
-// Displayed placeholder text for unavailable reviews or game data.
-// Code Readability:
-
-// Improved readability with consistent indentation and structured logical sections.

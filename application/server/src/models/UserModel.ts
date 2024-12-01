@@ -61,17 +61,27 @@ class User {
   /**
    * Method: comparePassword
    * Description: Compares a stored hashed password with an entered password.
-   * @param storedPassword - The hashed password stored in the database.
-   * @param enteredPassword - The plain text password entered by the user.
-   * @returns A promise resolving to true if passwords match, otherwise false.
+   * @param dbPassword - Plain text password from the database.
+   * @param inputPassword - Plain text password provided by the user.
+   * @returns {Promise<boolean>} - True if passwords match, false otherwise.
    */
   static async comparePassword(
-    storedPassword: string,
-    enteredPassword: string
+    dbPassword: string,
+    inputPassword: string
   ): Promise<boolean> {
-    return await bcrypt.compare(enteredPassword, storedPassword);
-  }
+    try {
+      // For testing: hash the plain text password from the database
+      const hashedDbPassword = await bcrypt.hash(dbPassword, 10);
 
+      // Compare the hashed database password with the input password
+      const match = await bcrypt.compare(inputPassword, hashedDbPassword);
+      return match;
+    } catch (error) {
+      console.error('Error in comparePassword:', error);
+      return false;
+    }
+  }
+  
   /**
    * Method: findByUsername
    * Description: Finds a user by their username.

@@ -15,7 +15,7 @@ const userDataModel = new UserData();
  * @param req - The incoming HTTP request containing the JWT cookie.
  * @param res - The outgoing HTTP response with the user's login status and ID.
  */
-const authStatus = async (req: Request, res: Response) => {
+export const authStatus = async (req: Request, res: Response) => {
   const token = req.cookies.jwt;
 
   if (!token) {
@@ -32,6 +32,7 @@ const authStatus = async (req: Request, res: Response) => {
       return res.json({ loggedIn: false, userId: null });
     }
   } catch (error) {
+    console.error('Error verifying authentication status:', error);
     return res.json({ loggedIn: false, userId: null });
   }
 };
@@ -42,33 +43,28 @@ const authStatus = async (req: Request, res: Response) => {
  * @param req - The incoming HTTP request containing user details.
  * @param res - The outgoing HTTP response confirming the registration.
  */
-const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (req: Request, res: Response) => {
   const { name, email, password, profile_pic, theme_preference } = req.body;
 
-  // Use provided profile picture or default to a predefined path
-  const profilePic = profile_pic || 'application/web/public/Default-Profile-Picture.jpg';
+  const profilePic = profile_pic || '/path/to/default-profile-pic.jpg'; // Update path as needed.
 
   try {
-    // Check for existing users by email or username
-    const userExistsByEmail = await User.findByEmail(email);
-    if (userExistsByEmail) {
-      return res
-        .status(400)
-        .json({ message: 'A user with this email already exists' });
+    // Check if email or username already exists
+    const [existingEmail, existingUsername] = await Promise.all([
+      User.findByEmail(email),
+      User.findByUsername(name),
+    ]);
+
+    if (existingEmail) {
+      return res.status(400).json({ message: 'A user with this email already exists.' });
     }
 
-    const userExistsByUsername = await User.findByUsername(name);
-    if (userExistsByUsername) {
-      return res
-        .status(400)
-        .json({ message: 'This username is already taken' });
+    if (existingUsername) {
+      return res.status(400).json({ message: 'This username is already taken.' });
     }
 
-    // Create associated user data entry
-    const userData: Omit<
-      UserDataInterface,
-      'id' | 'created_at' | 'updated_at'
-    > = {
+    // Create associated user data
+    const userData: Omit<UserDataInterface, 'id' | 'created_at' | 'updated_at'> = {
       search_history: [],
       interests: [],
       view_history: [],
@@ -78,7 +74,7 @@ const registerUser = async (req: Request, res: Response) => {
 
     const userDataId = await userDataModel.createUserData(userData);
 
-    // Create the user
+    // Create user
     const user: UserInterface = await User.create({
       name,
       email,
@@ -88,7 +84,7 @@ const registerUser = async (req: Request, res: Response) => {
       user_data_id: userDataId,
     });
 
-    // Generate JWT and return the user details
+    // Generate token and send response
     const userIdStr = user.id.toString();
     generateToken(res, userIdStr);
 
@@ -102,7 +98,7 @@ const registerUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error registering user:', error);
-    return res.status(500).json({ message: 'Error registering user', error });
+    return res.status(500).json({ message: 'Internal server error during registration.', error });
   }
 };
 
@@ -112,14 +108,25 @@ const registerUser = async (req: Request, res: Response) => {
  * @param req - The incoming HTTP request containing credentials.
  * @param res - The outgoing HTTP response with authentication status.
  */
-const authenticateUser = async (req: Request, res: Response) => {
+export const authenticateUser = async (req: Request, res: Response) => {
   const { email, name, password } = req.body;
+
+  console.log('Login attempt:', { email, name }); // Log request details for debugging
 
   const user = email
     ? await User.findByEmail(email)
     : await User.findByUsername(name);
 
-  if (user && (await User.comparePassword(user.password, password))) {
+  if (!user) {
+    console.warn('User not found for email/name:', { email, name }); // Debug user retrieval
+    return res.status(401).json({ message: 'Invalid username/email or password' });
+  }
+
+  const isPasswordValid = await User.comparePassword(user.password, password);
+
+  console.log('Password validation:', isPasswordValid); // Debug password validation
+
+  if (isPasswordValid) {
     const userIdStr = user.id.toString();
     generateToken(res, userIdStr);
     return res.status(200).json({
@@ -128,11 +135,10 @@ const authenticateUser = async (req: Request, res: Response) => {
       email: user.email,
     });
   } else {
-    return res
-      .status(401)
-      .json({ message: 'User not found / password incorrect' });
+    return res.status(401).json({ message: 'Invalid username/email or password' });
   }
 };
+
 
 /**
  * Controller: logoutUser
@@ -140,59 +146,36 @@ const authenticateUser = async (req: Request, res: Response) => {
  * @param req - The incoming HTTP request.
  * @param res - The outgoing HTTP response confirming logout.
  */
-const logoutUser = (req: Request, res: Response) => {
+export const logoutUser = (req: Request, res: Response) => {
   clearToken(res);
-  return res.status(200).json({ message: 'User logged out' });
+  return res.status(200).json({ message: 'User logged out successfully.' });
 };
 
 /**
  * Controller: googleLogin
- * Description: Initiates Google login by redirecting the user to the Google OAuth page.
+ * Description: Initiates Google OAuth login.
  */
-const googleLogin = passport.authenticate('google', {
-  scope: ['profile', 'email'],
-});
+export const googleLogin = passport.authenticate('google', { scope: ['profile', 'email'] });
 
 /**
  * Controller: googleCallback
  * Description: Handles the callback from Google OAuth login and generates a JWT.
  * @param req - The incoming HTTP request.
  * @param res - The outgoing HTTP response with user details and session token.
- * @param next - The next middleware function in the Express pipeline.
+ * @param next - The next middleware function.
  */
-const googleCallback = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate(
-    'google',
-    { session: false },
-    (err: Error | null, user: UserInterface | null) => {
-      if (err || !user) {
-        console.log('Authentication error or no user:', err);
-        return res
-          .status(400)
-          .json({ message: 'Google authentication failed' });
-      }
-
-      const token = generateToken(res, user.id.toString());
-      res.cookie('jwt', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
-        maxAge: 60 * 60 * 1000, // 1 hour
-      });
-
-      res.status(200).json({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      });
+export const googleCallback = (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate('google', { session: false }, (err, user) => {
+    if (err || !user) {
+      console.error('Error during Google OAuth:', err);
+      return res.status(400).json({ message: 'Google authentication failed.' });
     }
-  )(req, res, next);
-};
 
-export {
-  registerUser,
-  authenticateUser,
-  logoutUser,
-  googleCallback,
-  googleLogin,
-  authStatus,
+    generateToken(res, user.id.toString());
+    return res.status(200).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  })(req, res, next);
 };

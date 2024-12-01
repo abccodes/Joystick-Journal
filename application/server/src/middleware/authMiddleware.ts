@@ -19,9 +19,16 @@ const authenticate = async (
 ) => {
   const token = req.cookies.jwt; // Retrieve the JWT from cookies
 
+  // Ensure the secret key is set in environment variables
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET is not set in the environment variables');
+    return res.status(500).json({ message: 'Server error: Missing secret key' });
+  }
+
   // If no token is provided, respond with a 401 status
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized: No token provided' });
+  if (!token || typeof token !== 'string') {
+    console.warn('Invalid or missing token:', token);
+    return res.status(401).json({ message: 'Unauthorized: No valid token provided' });
   }
 
   try {
@@ -30,11 +37,16 @@ const authenticate = async (
       userId: number;
     };
 
+    console.log('Decoded Token:', decoded); // Debugging log for the decoded token
+
     // Fetch the user from the database using the decoded userId
     const user = (await User.findById(decoded.userId)) as UserInterface;
 
+    console.log('User Found:', user); // Debugging log for the user retrieved
+
     // If the user does not exist, respond with a 401 status
     if (!user) {
+      console.warn('User not found for ID:', decoded.userId);
       return res.status(401).json({ message: 'Unauthorized: User not found' });
     }
 

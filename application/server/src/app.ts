@@ -16,8 +16,13 @@ import gameRouter from './routes/gameRoutes';
 import reviewRouter from './routes/reviewRoutes';
 import recommendations from './routes/recommendationRoutes';
 import { getPool } from './connections/database';
+import fs from 'fs';
+import util from 'util';
 
 dotenv.config();
+
+// Promisify readFile to use async/await
+const readFile = util.promisify(fs.readFile);
 
 // Create the Express app
 const app = express();
@@ -32,7 +37,7 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         'default-src': ["'self'"],
-        'connect-src': ["'self'", 'http://127.0.0.1:8000'], // Add other sources if required
+        'connect-src': ["'self'", 'http://127.0.0.1:8000'],
       },
     },
   })
@@ -46,9 +51,10 @@ const allowedOrigins = [
   'http://localhost:8000',
   'http://127.0.0.1:8000',
   'http://localhost:3000',
-  'http://127.0.0.1:5500',
+  'http://127.0.0.1:3000',
+  'http://localhost:3306',
+  'http://127.0.0.1:3306',
   'https://gameratings-63hlr9lx0-abccodes-projects.vercel.app/',
-  // 'https://your-production-domain.com', // Uncomment for production
 ];
 
 app.use(
@@ -88,19 +94,25 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // Ensure GOOGLE_CLIENT_SECRET exists in .env
       callbackURL: '/api/auth/google/callback', // This route must match the authRouter configuration
     },
-    (accessToken, refreshToken, profile: Profile, done) => {
-      // Map profile to a User-compatible object
+    (accessToken, refreshToken, profile, done) => {
+      // Map Google profile to the current User interface
       const user = {
-        id: Number(profile.id), // Convert string ID to number
-        name: profile.displayName,
+        id: 0, // Placeholder since Google doesn't provide numeric IDs
+        name: profile.displayName || 'Google User', // Use displayName if available
         email: profile.emails?.[0]?.value || '', // Use the first email if available
+        password: '', // Password isn't relevant for OAuth users
         profile_pic: profile.photos?.[0]?.value || null, // Use the first profile picture if available
+        theme_preference: 'light', // Default value
+        user_data_id: null, // Placeholder
+        created_at: new Date(), // Placeholder
+        updated_at: new Date(), // Placeholder
       };
 
       return done(null, user);
     }
   )
 );
+
 passport.serializeUser((user, done) => {
   done(null, user);
 });
@@ -109,37 +121,61 @@ passport.deserializeUser((obj: any, done) => {
 });
 
 /**
- * Error Handling Middleware
+ * Function: initializeDatabase
+ * Description: Runs the SQL initialization script to ensure required tables exist.
  */
-app.use(errorHandler);
+async function initializeDatabase() {
+  const pool = getPool();
+
+  try {
+      // Create the database
+      await pool.query('CREATE DATABASE IF NOT EXISTS ratings_dev_db');
+      console.log('Database created or already exists.');
+
+      // Switch to the new database
+      await pool.query('USE ratings_dev_db');
+      console.log('Using database ratings_dev_db.');
+
+      // Create tables and insert sample data
+      const sql = fs.readFileSync('./scripts/DB.sql', 'utf8');
+      const statements = sql.split(';').filter(stmt => stmt.trim());
+
+      for (const stmt of statements) {
+          await pool.query(stmt);
+      }
+      console.log('Database tables created successfully.');
+  } catch (error) {
+      console.error('Error initializing the database:', error);
+      process.exit(1); // Exit the application if database initialization fails
+  }
+}
+
+
+// Initialize database and start the server
+initializeDatabase()
+  .then(() => {
+    app.listen(3306, () => {
+      console.log('Server is running on port 3306');
+    });
+  })
+  .catch((error) => {
+    console.error('Server failed to start due to database initialization error:', error);
+  });
 
 /**
  * Routes
  */
-app.use('/api/auth', authRouter); // Authentication routes
-app.use('/api/users', authenticate, userRouter); // User routes, protected with `authenticate`
-app.use('/api/games', gameRouter); // Game routes
-app.use('/api/userdata', userDataRouter); // User data routes
-app.use('/api/reviews', reviewRouter); // Review routes
-app.use('/api/recommendations', recommendations); // Recommendation routes
+app.use('/api/auth', authRouter);
+app.use('/api/users', authenticate, userRouter);
+app.use('/api/games', gameRouter);
+app.use('/api/userdata', userDataRouter);
+app.use('/api/reviews', reviewRouter);
+app.use('/api/recommendations', recommendations);
 
-/**
- * Fallback route
- * Description: Root route that responds if no specific route is matched.
- */
+// Fallback route
 app.get('/', (req, res) => {
   res.send('The server is working, but the index page isn’t loading.');
 });
 
-/**
- * Database Connection
- * Description: Test the connection pool initialization using `getPool`.
- */
-try {
-  const pool = getPool(); // Initialize the connection pool
-  console.log('Database connection pool initialized successfully');
-} catch (error) {
-  console.error('Failed to initialize database connection pool:', error);
-}
 
 export default app;

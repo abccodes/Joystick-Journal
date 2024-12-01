@@ -1,5 +1,3 @@
-// gameRoutes.ts
-
 import { Router } from 'express';
 import {
   createGame,
@@ -14,10 +12,13 @@ const router = Router();
 
 /**
  * Route: GET /all
- * Description: Fetches a list of all games.
+ * Description: Fetches a list of all games with an optional limit.
  * Controller: getAllGames
+ * Query Parameters:
+ * - limit: The maximum number of games to retrieve (number, optional).
  * Response:
  * - 200: Successfully retrieved the list of games.
+ * - 404: No games found.
  * - 500: Internal server error while fetching the data.
  */
 router.get('/all', getAllGames);
@@ -31,6 +32,8 @@ router.get('/all', getAllGames);
  * - description: A brief description of the game (string).
  * - release_date: The release date of the game (string or Date).
  * - genre: The genre of the game (string).
+ * - tags: Array of tags associated with the game (optional, array of strings).
+ * - platforms: Platforms the game is available on (optional, array of strings).
  * Response:
  * - 201: Game created successfully.
  * - 400: Missing or invalid request body fields.
@@ -43,11 +46,13 @@ router.post('/create', createGame);
  * Description: Searches for games based on query parameters.
  * Controller: searchGames
  * Query Parameters:
- * - name: The name of the game to search for (string).
- * - genre: The genre of the game to filter by (string).
+ * - query: The search term for the game name (string, optional).
+ * - genre: The genre of the game to filter by (string, optional).
+ * - review_rating: Minimum review rating (number, optional).
+ * - game_mode: The game mode to filter by ('single-player', 'multiplayer', or 'both').
  * Response:
  * - 200: Successfully retrieved search results.
- * - 400: Missing or invalid query parameters.
+ * - 404: No games found.
  * - 500: Internal server error during the search.
  */
 router.get('/search', searchGames);
@@ -72,7 +77,7 @@ router.get('/:gameId', getGame);
  * URL Parameters:
  * - gameId: The unique ID of the game to update (number or string).
  * Request Body:
- * - JSON object containing fields to update (e.g., name, description, genre).
+ * - JSON object containing fields to update (e.g., name, description, genre, tags, platforms).
  * Response:
  * - 200: Game updated successfully.
  * - 400: Missing or invalid request body fields.
@@ -81,13 +86,17 @@ router.get('/:gameId', getGame);
  */
 router.put('/:gameId', editGame);
 
-// Commented-out legacy code for reference
 /**
  * Route: DELETE /:gameId
  * Description: Deletes a game entry by its ID.
  * Controller: removeGame
- * Status: Legacy, not currently exposed for public use.
+ * URL Parameters:
+ * - gameId: The unique ID of the game to delete (number or string).
+ * Response:
+ * - 200: Game deleted successfully.
+ * - 404: Game not found.
+ * - 500: Internal server error during deletion.
  */
-// router.delete('/:gameId', removeGame);
+router.delete('/:gameId', removeGame);
 
 export default router;

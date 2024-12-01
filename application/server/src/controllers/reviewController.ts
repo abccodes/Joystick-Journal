@@ -13,24 +13,22 @@ const reviewModel = new ReviewModel();
 export const createReview = async (
   req: Request,
   res: Response
-): Promise<Response> => {
+): Promise<Response | void> => { // Updated return type to match Response or void
   try {
-    const { id } = req.params;
+    const userId = req.user?.id;
 
-    if (!id) {
-      return res
-        .status(401)
-        .json({ message: 'Unauthorized: Please sign in to create a review' });
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized: Please sign in to create a review' });
     }
 
     const { game_id, rating, review_text } = req.body;
 
     if (!game_id || !rating || !review_text) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing required fields: game_id, rating, or review_text' });
     }
 
     const reviewId = await reviewModel.createReview({
-      user_id: Number(id),
+      user_id: userId,
       game_id,
       rating,
       review_text,
@@ -45,16 +43,14 @@ export const createReview = async (
   }
 };
 
+
 /**
  * Controller: getReviewById
  * Description: Fetches a single review by its ID.
  * @param req - The incoming HTTP request containing the review ID in params.
  * @param res - The outgoing HTTP response containing the review data.
  */
-export const getReviewById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getReviewById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const review = await reviewModel.getReviewById(Number(id));
@@ -76,10 +72,7 @@ export const getReviewById = async (
  * @param req - The incoming HTTP request containing the game ID in params.
  * @param res - The outgoing HTTP response containing an array of reviews.
  */
-export const getReviewByGameId = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getReviewByGameId = async (req: Request, res: Response): Promise<void> => {
   try {
     const { gameId } = req.params;
     const reviews = await reviewModel.getReviewByGameId(Number(gameId));
@@ -87,7 +80,7 @@ export const getReviewByGameId = async (
     if (!reviews || reviews.length === 0) {
       res.status(404).json({ message: 'No reviews found for this game' });
     } else {
-      res.status(200).json(reviews); // Send the array of reviews
+      res.status(200).json(reviews);
     }
   } catch (error) {
     console.error('Error fetching reviews by gameId:', error);
@@ -101,7 +94,7 @@ export const getReviewByGameId = async (
  * @param req - The incoming HTTP request containing review ID in params and updates in the body.
  * @param res - The outgoing HTTP response confirming the update.
  */
-export const updateReview = async (req: Request, res: Response) => {
+export const updateReview = async (req: Request, res: Response): Promise<Response | void> => { // Updated return type
   try {
     const { id } = req.params;
     const reviewId = Number(id);
@@ -115,12 +108,13 @@ export const updateReview = async (req: Request, res: Response) => {
     if (!verifyOwnership(req, res, review.user_id)) return;
 
     await reviewModel.updateReview(reviewId, req.body);
-    res.status(200).json({ message: 'Review updated successfully' });
+    return res.status(200).json({ message: 'Review updated successfully' }); // Ensure consistent return
   } catch (err) {
     console.error('Error updating review:', err);
-    res.status(500).json({ message: 'Error updating review' });
+    return res.status(500).json({ message: 'Error updating review' }); // Ensure consistent return
   }
 };
+
 
 /**
  * Controller: deleteReview
@@ -128,7 +122,7 @@ export const updateReview = async (req: Request, res: Response) => {
  * @param req - The incoming HTTP request containing review ID in params.
  * @param res - The outgoing HTTP response confirming the deletion.
  */
-export const deleteReview = async (req: Request, res: Response) => {
+export const deleteReview = async (req: Request, res: Response): Promise<Response | void> => { // Updated return type
   try {
     const { id } = req.params;
     const reviewId = Number(id);
@@ -142,9 +136,9 @@ export const deleteReview = async (req: Request, res: Response) => {
     if (!verifyOwnership(req, res, review.user_id)) return;
 
     await reviewModel.deleteReview(reviewId);
-    res.status(200).json({ message: 'Review deleted successfully' });
+    return res.status(200).json({ message: 'Review deleted successfully' }); // Ensure consistent return
   } catch (err) {
     console.error('Error deleting review:', err);
-    res.status(500).json({ message: 'Error deleting review' });
+    return res.status(500).json({ message: 'Error deleting review' }); // Ensure consistent return
   }
 };

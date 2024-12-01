@@ -1,13 +1,6 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { getPool } from '../connections/database';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
-import {
-  createReview,
-  getReviewById,
-  getReviewByGameId,
-  updateReview,
-  deleteReview,
-} from '../controllers/reviewController';
 import { authenticate } from '../middleware/authMiddleware';
 
 declare global {
@@ -21,12 +14,15 @@ declare global {
 // Initialize the router
 const router = Router();
 
+// Initialize database pool
+const pool = getPool();
+
 /**
- * Route: POST /
- * Description: Create a new review for a game.
+ * Function: createReview
+ * Description: Handles creating a new review for a game.
  * Middleware: Requires authentication.
  */
-router.post('/', authenticate, async (req, res) => {
+const createReview = async (req: Request, res: Response): Promise<Response> => {
   const { game_id, rating, review_text } = req.body;
   const user_id = req.user?.id;
 
@@ -34,7 +30,6 @@ router.post('/', authenticate, async (req, res) => {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  const pool = getPool();
   try {
     const [result] = await pool.query<ResultSetHeader>(
       'INSERT INTO reviews (user_id, game_id, rating, review_text) VALUES (?, ?, ?, ?)',
@@ -42,22 +37,50 @@ router.post('/', authenticate, async (req, res) => {
     );
 
     if (result.insertId) {
-      res.status(201).json({ message: 'Review created successfully', reviewId: result.insertId });
+      return res.status(201).json({ message: 'Review created successfully', reviewId: result.insertId });
     } else {
       throw new Error('Review creation failed: insertId missing');
     }
-  } catch (error) {
-    console.error('Error creating review:', error);
-    res.status(500).json({ message: 'Database error', error });
+  } catch (error: any) {
+    console.error('Error creating review:', error.message);
+    return res.status(500).json({ message: 'Database error', error: error.message });
   }
-});
+};
 
 /**
- * Route: PUT /:id
- * Description: Update a review by its ID.
+ * Function: getReviewsByGameId
+ * Description: Retrieves all reviews for a specific game.
+ */
+const getReviewsByGameId = async (req: Request, res: Response): Promise<Response> => {
+  const { gameId } = req.params;
+
+  if (!gameId) {
+    return res.status(400).json({ message: 'Game ID is required' });
+  }
+
+  try {
+    const [reviews] = await pool.query<RowDataPacket[]>(
+      'SELECT * FROM reviews WHERE game_id = ?',
+      [gameId]
+    );
+
+    if (reviews.length === 0) {
+      return res.status(404).json({ message: 'No reviews found for this game' });
+    }
+
+    return res.status(200).json(reviews);
+  } catch (error: any) {
+    console.error('Error fetching reviews:', error.message);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+/**
+ * Function: updateReview
+ * Description: Updates an existing review by its ID.
  * Middleware: Requires authentication.
  */
-router.put('/:id', authenticate, async (req, res) => {
+const updateReview = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
   const { rating, review_text } = req.body;
   const user_id = req.user?.id;
@@ -66,7 +89,6 @@ router.put('/:id', authenticate, async (req, res) => {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  const pool = getPool();
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
       'SELECT * FROM reviews WHERE review_id = ?',
@@ -83,19 +105,19 @@ router.put('/:id', authenticate, async (req, res) => {
       id,
     ]);
 
-    res.status(200).json({ message: 'Review updated successfully' });
-  } catch (error) {
-    console.error('Error updating review:', error);
-    res.status(500).json({ message: 'Server error', error });
+    return res.status(200).json({ message: 'Review updated successfully' });
+  } catch (error: any) {
+    console.error('Error updating review:', error.message);
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
-});
+};
 
 /**
- * Route: DELETE /:id
- * Description: Delete a review by its ID.
+ * Function: deleteReview
+ * Description: Deletes a review by its ID.
  * Middleware: Requires authentication.
  */
-router.delete('/:id', authenticate, async (req, res) => {
+const deleteReview = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
   const user_id = req.user?.id;
 
@@ -103,7 +125,6 @@ router.delete('/:id', authenticate, async (req, res) => {
     return res.status(403).json({ message: 'You can only delete your own reviews' });
   }
 
-  const pool = getPool();
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
       'SELECT * FROM reviews WHERE review_id = ?',
@@ -116,11 +137,36 @@ router.delete('/:id', authenticate, async (req, res) => {
 
     await pool.query('DELETE FROM reviews WHERE review_id = ?', [id]);
 
-    res.status(200).json({ message: 'Review deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting review:', error);
-    res.status(500).json({ message: 'Server error', error });
+    return res.status(200).json({ message: 'Review deleted successfully' });
+  } catch (error: any) {
+    console.error('Error deleting review:', error.message);
+    return res.status(500).json({ message: 'Server error', error: error.message });
   }
-});
+};
+
+// Routes
+/**
+ * Route: POST /
+ * Description: Create a new review for a game.
+ */
+router.post('/', authenticate, createReview);
+
+/**
+ * Route: GET /game/:gameId
+ * Description: Fetch all reviews for a specific game.
+ */
+router.get('/game/:gameId', getReviewsByGameId);
+
+/**
+ * Route: PUT /:id
+ * Description: Update a review by its ID.
+ */
+router.put('/:id', authenticate, updateReview);
+
+/**
+ * Route: DELETE /:id
+ * Description: Delete a review by its ID.
+ */
+router.delete('/:id', authenticate, deleteReview);
 
 export default router;

@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    profile_pic VARCHAR(255) DEFAULT 'application/web/public/Default-Profile-Picture.jpg',
+    profile_pic VARCHAR(255) DEFAULT NULL,
     theme_preference ENUM('light', 'dark') DEFAULT 'light',
-    user_data_id INT,  -- Foreign key linking to user_data table
+    user_data_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_data_id) REFERENCES user_data(id) ON DELETE SET NULL
@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS games (
 -- Create `reviews` table
 CREATE TABLE IF NOT EXISTS reviews (
     review_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,  -- Foreign key to users table
-    game_id INT NOT NULL,  -- Foreign key to games table
+    user_id INT NOT NULL,
+    game_id INT NOT NULL,
     rating INT CHECK (rating BETWEEN 1 AND 5),
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (game_id) REFERENCES games(game_id) ON DELETE CASCADE
 );
+
 
 -- Insert sample data into `user_data` table
 INSERT INTO user_data (search_history, interests, view_history, review_history, genres) VALUES

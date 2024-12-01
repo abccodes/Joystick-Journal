@@ -21,5 +21,5 @@ const port = process.env.PORT || 8000;
  * Logs a message indicating that the server is running and listening on the specified port.
  */
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Backend server is running on port ${port}`);
 });

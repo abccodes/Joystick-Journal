@@ -5,13 +5,14 @@ services:
     container_name: project_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: projectdb
+      MYSQL_ROOT_PASSWORD: abc123
+      MYSQL_DATABASE: ratings_dev_db
       MYSQL_USER: projectuser
-      MYSQL_PASSWORD: projectpassword
+      MYSQL_PASSWORD: abc123
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./application/server/scripts/DB.sql:/docker-entrypoint-initdb.d/init.sql
 volumes:
   mysql_data:

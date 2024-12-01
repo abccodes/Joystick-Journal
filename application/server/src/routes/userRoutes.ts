@@ -1,48 +1,65 @@
 import express from 'express';
+import multer from 'multer';
 import {
   getUser,
   getUserByEmail,
+  getUserByUserName,
   updateUserProfilePicture,
 } from '../controllers/userController';
 import { authenticate } from '../middleware/authMiddleware';
-import { fileUploadMiddleware } from '../middleware/fileUploadMiddleware';
-import { getPool } from '../connections/database';
-
-declare global {
-  namespace Express {
-    interface User {
-      id: number; // Ensure compatibility with the `User` type in `@types/passport`
-    }
-  }
-}
 
 const router = express.Router();
 
+// Configure multer for file uploads
+const upload = multer({ dest: 'uploads/' });
+
 /**
- * Route: PUT /:id
- * Description: Update user details (name, email) by ID.
- * Middleware: Requires authentication.
+ * Route: GET /me
+ * Description: Fetches the authenticated user's details.
+ * Controller: getUser
+ * Middleware: authenticate
+ * Response:
+ * - 200: User details successfully retrieved.
+ * - 401: Unauthorized access.
  */
-router.put('/:id', authenticate, async (req, res) => {
-  const { id } = req.params;
-  const { name, email } = req.body;
+router.get('/me', authenticate, getUser);
 
-  if (!name || !email) {
-    return res.status(400).json({ message: 'Missing required fields: name or email' });
-  }
+/**
+ * Route: GET /email/:email
+ * Description: Fetches user details by email.
+ * Controller: getUserByEmail
+ * URL Parameters:
+ * - email: The email of the user to fetch.
+ * Response:
+ * - 200: User details successfully retrieved.
+ * - 404: User not found.
+ */
+router.get('/email/:email', getUserByEmail);
 
-  if (!req.user || req.user.id !== parseInt(id, 10)) {
-    return res.status(403).json({ message: 'Forbidden: Access denied' });
-  }
+/**
+ * Route: GET /username/:name
+ * Description: Fetches user details by username.
+ * Controller: getUserByUserName
+ * URL Parameters:
+ * - name: The username of the user to fetch.
+ * Response:
+ * - 200: User details successfully retrieved.
+ * - 404: User not found.
+ */
+router.get('/username/:name', getUserByUserName);
 
-  const pool = getPool();
-  try {
-    await pool.query('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, id]);
-    res.status(200).json({ message: 'Profile updated successfully' });
-  } catch (error) {
-    console.error('Error updating user profile:', error);
-    res.status(500).json({ message: 'Database error', error });
-  }
-});
+/**
+ * Route: PUT /me/profile-picture
+ * Description: Updates the authenticated user's profile picture.
+ * Controller: updateUserProfilePicture
+ * Middleware: authenticate, upload.single('profilePic')
+ * Request Body:
+ * - profilePic: The file to upload as the user's profile picture.
+ * Response:
+ * - 200: Profile picture successfully updated.
+ * - 400: No file uploaded.
+ * - 401: Unauthorized access.
+ */
+router.put('/me/profile-picture', authenticate, upload.single('profilePic'), updateUserProfilePicture);
 
 export default router;
