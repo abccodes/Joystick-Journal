@@ -12,14 +12,13 @@
     <header class="banner">
         <div class="banner-picture"></div>
         <div class="banner-content">
+            <!-- Make the title clickable -->
             <h1 class="title">
                 <a href="index.html" class="title-link">Rate My Video Game</a>
             </h1>
             <div class="buttons">
-                <a href="signup.html" class="pill-button">Sign Up</a>
-                <a href="login.html" class="pill-button">Login</a>
-                <a href="#" class="pill-button" id="logout-btn" style="display: none;">Logout</a>
-                <a href="view-profile.html" class="pill-button" id="settings-btn" style="display: none;">Settings</a>
+                <button class="pill-button">Sign Up</button>
+                <button class="pill-button">Login</button>
             </div>
         </div>
     </header>
@@ -28,8 +27,7 @@
     <section class="content-section">
 
         <div class="review-container">
-            <h2 id="game-title">Loading Game Title...</h2>
-            
+            <h2 id="game-title">Game Title</h2>
             <!-- Star Rating Section -->
             <div class="star-rating">
                 <span class="star" data-value="1">&#9733;</span>
@@ -46,115 +44,13 @@
             <!-- Post Review Button -->
             <button class="post-review">Post Review</button>
         </div>
+        
+
     </section>
 
-    <footer>
-        <ul class="footer-links">
-            <li><a href="#">Ad Choices</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-        </ul>
-    </footer>
+    <script src="script.js"></script>
+    <script src="game-review.js"></script>
+    
 
-    <script>
-        // Extract gameId from URL parameters
-        const gameId = new URLSearchParams(window.location.search).get('gameId');
-        const gameTitleElement = document.getElementById('game-title');
-        
-        // Populate the game title dynamically
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (gameId) {
-                try {
-                    const response = await fetch(`http://127.0.0.1:8000/api/games/${gameId}`);
-                    if (!response.ok) throw new Error('Failed to fetch game data');
-                    const gameData = await response.json();
-                    gameTitleElement.textContent = gameData.title || 'Game Title';
-                } catch (error) {
-                    console.error('Error fetching game data:', error);
-                    gameTitleElement.textContent = 'Game Title (Failed to Load)';
-                }
-            } else {
-                gameTitleElement.textContent = 'Invalid Game ID';
-            }
-        });
-
-        // Star rating interaction
-        const stars = document.querySelectorAll('.star');
-        stars.forEach((star) => {
-            star.addEventListener('click', () => {
-                stars.forEach((s) => s.classList.remove('active'));
-                star.classList.add('active');
-            });
-        });
-
-        // Handle review submission
-        document.querySelector('.post-review').addEventListener('click', async () => {
-            const reviewInput = document.querySelector('.review-input').value.trim();
-            const selectedStar = document.querySelector('.star.active');
-            const rating = selectedStar ? selectedStar.dataset.value : null;
-
-            if (!reviewInput || !rating) {
-                alert('Please provide a rating and review text.');
-                return;
-            }
-
-            const token = localStorage.getItem('jwt'); // Ensure user is logged in
-            if (!token) {
-                alert('You need to log in to post a review.');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            try {
-                const response = await fetch('http://127.0.0.1:8000/api/reviews', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        game_id: gameId,
-                        rating: parseInt(rating, 10),
-                        review_text: reviewInput,
-                    }),
-                });
-
-                if (response.ok) {
-                    alert('Review submitted successfully!');
-                    location.reload(); // Reload the page to reflect the new review
-                } else {
-                    const errorData = await response.json();
-                    alert(`Failed to submit review: ${errorData.message}`);
-                }
-            } catch (error) {
-                console.error('Error submitting review:', error);
-                alert('An unexpected error occurred. Please try again.');
-            }
-        });
-    </script>
 </body>
 </html>
-
-<!-- Key Improvements:
-Game Title Fetching:
-
-Dynamically fetches the game title using the game ID from the URL query parameter.
-Star Rating System:
-
-Added interactive star selection with clear visual feedback.
-Only one star can be selected at a time.
-Review Submission with Authorization:
-
-Checks if the user is logged in by verifying the presence of a JWT token.
-Sends the JWT token in the Authorization header when posting the review.
-Error Handling:
-
-Improved error handling for both game data fetching and review submission.
-Alerts the user if any operation fails.
-UX Enhancements:
-
-Displays a clear error message if the game ID is missing or invalid.
-Reloads the page after a successful review submission to show the new review.
-Footer Section:
-
-Added footer links for consistency across pages. -->

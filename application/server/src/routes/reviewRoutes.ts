@@ -37,7 +37,9 @@ const createReview = async (req: Request, res: Response): Promise<Response> => {
     );
 
     if (result.insertId) {
-      return res.status(201).json({ message: 'Review created successfully', reviewId: result.insertId });
+      return res
+        .status(201)
+        .json({ message: 'Review created successfully', reviewId: result.insertId });
     } else {
       throw new Error('Review creation failed: insertId missing');
     }

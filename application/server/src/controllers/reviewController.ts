@@ -13,36 +13,47 @@ const reviewModel = new ReviewModel();
 export const createReview = async (
   req: Request,
   res: Response
-): Promise<Response | void> => { // Updated return type to match Response or void
+): Promise<Response | void> => {
   try {
+    // Extract the user ID from the authenticated user (if applicable)
     const userId = req.user?.id;
 
+    // Ensure the user is authenticated
     if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized: Please sign in to create a review' });
+      return res
+        .status(401)
+        .json({ message: 'Unauthorized: Please sign in to create a review' });
     }
 
+    // Extract required fields from the request body
     const { game_id, rating, review_text } = req.body;
 
+    // Validate the request body
     if (!game_id || !rating || !review_text) {
-      return res.status(400).json({ message: 'Missing required fields: game_id, rating, or review_text' });
+      return res
+        .status(400)
+        .json({ message: 'Missing required fields: game_id, rating, or review_text' });
     }
 
+    // Create the review using the provided data
     const reviewId = await reviewModel.createReview({
-      user_id: userId,
+      user_id: userId, // Correctly assign the user ID
       game_id,
       rating,
       review_text,
     });
 
+    // Return a success response with the created review ID
     return res
       .status(201)
       .json({ message: 'Review created successfully', reviewId });
-  } catch (error) {
-    console.error('Error creating review:', error);
-    return res.status(500).json({ message: 'Error creating review', error });
+  } catch (error: any) {
+    console.error('Error creating review:', error.message);
+    return res
+      .status(500)
+      .json({ message: 'Error creating review', error: error.message });
   }
 };
-
 
 /**
  * Controller: getReviewById

@@ -192,16 +192,106 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize on page load
   await checkAuthStatus();
+  await updateProfileInformation();
+  // Select the profile picture elements
+  const profilePicUpload = document.getElementById('profilePicUpload');
+  const profilePic = document.getElementById('profilePic');
+
+  // Only add the event listener if the elements exist
+  if (profilePicUpload && profilePic) {
+    profilePicUpload.addEventListener('change', async function (event) {
+      console.log('File selected'); // Log to verify event trigger
+      const file = event.target.files[0];
+
+      if (file) {
+        // Display the preview
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          console.log('Image loaded'); // Log to verify loading
+          profilePic.src = e.target.result; // Set the profile picture src to the uploaded image's data URL
+        };
+        reader.readAsDataURL(file);
+
+        // Create FormData object to send the file to the server
+        const formData = new FormData();
+        formData.append('profilePicture', file);
+        formData.append('userId', userId); // Assuming you have `userId` from the auth status
+
+        try {
+          // Send the image to your server
+          const response = await fetch(
+            'http://127.0.0.1:8000/api/users/upload-profile-picture',
+            {
+              method: 'POST',
+              body: formData,
+              credentials: 'include', // Include credentials if needed
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log('Profile picture uploaded successfully', data);
+            alert('Profile picture uploaded successfully!');
+          } else {
+            console.error(
+              'Error uploading profile picture:',
+              response.statusText
+            );
+            alert('Failed to upload profile picture. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error uploading profile picture:', error);
+          alert('An error occurred while uploading. Please try again.');
+        }
+      }
+    });
+  }
+
+  if (searchButton && searchInput && gameGrid) {
+    searchButton.addEventListener('click', async () => {
+      const searchTerm = searchInput.value;
+      if (searchTerm) {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/games/search?query=${encodeURIComponent(
+              searchTerm
+            )}`,
+            {
+              credentials: 'include',
+            }
+          );
+
+          const games = await response.json();
+          if (!response.ok) throw new Error('Network response was not ok');
+
+          console.log(games)
+          
+          gameGrid.innerHTML = '';
+
+          games.forEach(game => {
+            const gameTile = document.createElement('div');
+            gameTile.className = 'game-tile';
+            gameTile.textContent = game.title;
+
+            const gameImage = document.createElement('img');
+            gameImage.src = game.cover_image ? game.cover_image : 'gameinfo_testimage.png';
+            gameImage.alt = game.title;
+            gameTile.appendChild(gameImage);
+            
+
+            gameTile.addEventListener('click', () => {
+              window.location.href = `game-info.html?gameId=${game.game_id}`;
+            });
+
+
+            gameGrid.appendChild(gameTile);
+          });
+        } catch (error) {
+          console.error('Error fetching games:', error);
+        }
+      } else {
+        alert('Please enter a search term');
+      }
+    });
+  }
 });
-
-
-
-// Key Improvements
-// Refactoring Reusable Logic:
-// Created reusable functions like handleLogin, handleLogout, and fetchRecommendations to encapsulate logic for better readability and maintainability.
-// Error Handling:
-// Improved error handling with meaningful error messages and fallback UI elements.
-// Comments:
-// Added detailed comments explaining the purpose and functionality of each section.
-// Authentication Check:
-// Consolidated checkAuthStatus to update UI elements dynamically based on the user's login state.
