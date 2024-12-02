@@ -23,17 +23,21 @@ dotenv.config();
 
 const app = express();
 
-app.use(helmet());
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         'default-src': ["'self'"],
-        'connect-src': ["'self'", 'http://127.0.0.1:8000'],
+        'connect-src': [
+          "'self'",
+          'http://127.0.0.1:8000',
+          'http://localhost:8000', // Allow localhost too
+        ],
       },
     },
   })
 );
+
 
 const allowedOrigins = [
   'http://localhost:8000',
