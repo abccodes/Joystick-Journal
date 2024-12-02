@@ -44,7 +44,8 @@ class User {
     storedPassword: string,
     enteredPassword: string
   ): Promise<boolean> {
-    return await bcrypt.compare(enteredPassword, storedPassword);
+    return storedPassword == enteredPassword;
+    //return await bcrypt.compare(enteredPassword, storedPassword);
   }
 
   static async findByUsername(

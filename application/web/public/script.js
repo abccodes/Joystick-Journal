@@ -294,6 +294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (searchButton && searchInput && gameGrid) {
     searchButton.addEventListener('click', async () => {
       const searchTerm = searchInput.value;
+      console.log('Search term:', searchTerm); // Log search term
       if (searchTerm) {
         try {
           const response = await fetch(
@@ -304,6 +305,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               credentials: 'include',
             }
           );
+
+          console.log('Fetch response:', response); // Log raw response
 
           const games = await response.json();
           if (!response.ok) throw new Error('Network response was not ok');

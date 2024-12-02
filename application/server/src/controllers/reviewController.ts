@@ -12,18 +12,18 @@ export const createReview = async (
 
     //commented out to test posting reviews without auth
 
-    /**
-    const { id } = req.params;
+    
+    const user = req.user as { id: number } | undefined;
 
-    if (!id) {
+    if (!user?.id) {
       return res
         .status(401)
         .json({ message: 'Unauthorized: Please sign in to create a review' });
     }
 
-    **/ 
     
-    const user_id = 1; // Hardcoded for testing
+    
+    //const user_id = 1; // Hardcoded for testing
 
     const { game_id, rating, review_text } = req.body;
 
