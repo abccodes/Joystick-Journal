@@ -298,9 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (searchTerm) {
         try {
           const response = await fetch(
-            `http://localhost:8000/api/games/search?query=${encodeURIComponent(
-              searchTerm
-            )}`,
+            `http://127.0.0.1:8000/api/games/search?query=${encodeURIComponent(searchTerm)}`,
             {
               credentials: 'include',
             }
