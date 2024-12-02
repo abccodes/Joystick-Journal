@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        section {
+            margin: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        pre {
+            background: #f4f4f9;
+            border-left: 4px solid #333;
+            color: #666;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        .code-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Project Documentation</h1>
+    <p>Generated Documentation for Features: User Authentication, Search, Reviews, Ratings, and Browsing</p>
+</header>
+
+<section>
+    <h2>User Authentication</h2>
+    <div>
+        <p>Provides functionalities for logging in users with their username and password. If authentication fails, prompts for retry or password reset.</p>
+        <div>
+            <p class="code-title">Function: <code>authenticateUser(req, res)</code></p>
+            <pre>
+/**
+ * Authenticates a user based on their email/username and password.
+ * @param req - Incoming HTTP request containing email and password.
+ * @param res - HTTP response with authentication success or failure.
+ * Response:
+ * - 200: Authentication successful. Returns user details and token.
+ * - 401: Invalid credentials.
+ * - 500: Internal server error.
+ */
+            </pre>
+        </div>
+        <div>
+            <p class="code-title">Function: <code>registerUser(req, res)</code></p>
+            <pre>
+/**
+ * Registers a new user with email, username, and password.
+ * @param req - HTTP request containing user details.
+ * @param res - HTTP response with registration status.
+ * Response:
+ * - 201: User registered successfully.
+ * - 400: Invalid or missing fields.
+ * - 500: Internal server error.
+ */
+            </pre>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Search for Games</h2>
+    <div>
+        <p>Enables users to search for video games by title. Results include the game's cover image, rating, and a link to reviews.</p>
+        <div>
+            <p class="code-title">Function: <code>searchGames(req, res)</code></p>
+            <pre>
+/**
+ * Searches for games by title.
+ * @param req - Incoming HTTP request with search query.
+ * @param res - HTTP response with search results.
+ * Response:
+ * - 200: Returns list of matching games with title, cover image, and rating.
+ * - 404: No games found.
+ * - 500: Internal server error.
+ */
+            </pre>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Game Review</h2>
+    <div>
+        <p>Allows users to leave reviews for games, including a rating and written text.</p>
+        <div>
+            <p class="code-title">Function: <code>createReview(req, res)</code></p>
+            <pre>
+/**
+ * Creates a new review for a specific game.
+ * @param req - Incoming HTTP request containing game ID, rating, and review text.
+ * @param res - HTTP response with review creation status.
+ * Response:
+ * - 201: Review created successfully.
+ * - 400: Invalid or missing fields.
+ * - 500: Internal server error.
+ */
+            </pre>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Game Rating</h2>
+    <div>
+        <p>Allows users to rate games on a scale of 1 to 5.</p>
+        <div>
+            <p class="code-title">Function: <code>rateGame(req, res)</code></p>
+            <pre>
+/**
+ * Rates a specific game.
+ * @param req - Incoming HTTP request with game ID and rating value.
+ * @param res - HTTP response with rating update status.
+ * Response:
+ * - 200: Rating submitted successfully.
+ * - 400: Invalid or missing fields.
+ * - 500: Internal server error.
+ */
+            </pre>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Browse for Video Games</h2>
+    <div>
+        <p>Enables users to browse video games by genre. Results include title, cover image, and average user rating.</p>
+        <div>
+            <p class="code-title">Function: <code>browseGames(req, res)</code></p>
+            <pre>
+/**
+ * Retrieves games based on genre.
+ * @param req - Incoming HTTP request with genre as a query parameter.
+ * @param res - HTTP response with a list of games in the specified genre.
+ * Response:
+ * - 200: Returns list of games with title, image, and average rating.
+ * - 404: No games found for the specified genre.
+ * - 500: Internal server error.
+ */
+            </pre>
+        </div>
+    </div>
+</section>
+</body>
+</html>

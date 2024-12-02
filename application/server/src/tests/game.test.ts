@@ -8,7 +8,7 @@ import {
   closeDatabase,
 } from './scripts/setupTests';
 
-let pool = getPool();
+const pool = getPool();
 
 describe('Games API Tests', () => {
   // Reset and seed the database before each test

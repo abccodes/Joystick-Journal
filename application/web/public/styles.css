@@ -253,10 +253,3 @@ footer {
   max-width: 800px;
   margin: auto;
 }
-
-/* Key Improvements:
-Comment Formatting: Clear and professional comments for easy documentation generation.
-Hover Effects: Added hover effects on buttons and game tiles for interactivity.
-Responsiveness: Used modern CSS practices (grid, flexbox) to ensure a responsive layout.
-Enhancements for Accessibility: Added cursor: pointer for clickable elements to improve UX.
-Simplified Customization: Centralized common styles like border-radius and box-shadow. */

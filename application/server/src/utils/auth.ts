@@ -4,10 +4,10 @@ import { Response } from 'express';
 /**
  * Utility Function: generateToken
  * Description: Generates a JSON Web Token (JWT) for a user and sets it as a cookie in the response.
- * @param res - The Express response object used to set the cookie.
- * @param userId - The unique identifier of the user for whom the token is being generated.
+ * @param {Response} res - The Express response object used to set the cookie.
+ * @param {string} userId - The unique identifier of the user for whom the token is being generated.
  */
-const generateToken = (res: Response, userId: string) => {
+const generateToken = (res: Response, userId: string): void => {
   const jwtSecret = process.env.JWT_SECRET || ''; // Retrieve the JWT secret from environment variables
   const token = jwt.sign({ userId }, jwtSecret, {
     expiresIn: '1h', // Token expiration time
@@ -25,9 +25,9 @@ const generateToken = (res: Response, userId: string) => {
 /**
  * Utility Function: clearToken
  * Description: Clears the JWT cookie by setting its value to an empty string and expiration to the past.
- * @param res - The Express response object used to clear the cookie.
+ * @param {Response} res - The Express response object used to clear the cookie.
  */
-const clearToken = (res: Response) => {
+const clearToken = (res: Response): void => {
   res.cookie('jwt', '', {
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
     expires: new Date(0), // Sets the expiration date to the past, effectively clearing the cookie

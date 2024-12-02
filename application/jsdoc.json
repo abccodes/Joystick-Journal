@@ -1,0 +1,16 @@
+{
+    "tags": {
+      "allowUnknownTags": true
+    },
+    "source": {
+      "include": ["server/src"],
+      "includePattern": ".+\\.(ts|js)$",
+      "excludePattern": "(^|\\/|\\\\)(node_modules|api\\/rawg\\.ts|app\\.ts|connections\\/database\\.ts|controllers\\/authController\\.ts|controllers\\/gameController\\.ts|controllers\\/helper\\/auth\\.ts|controllers\\/recommendationController\\.ts|controllers\\/reviewController\\.ts|controllers\\/userController\\.ts|controllers\\/userDataController\\.ts|interfaces\\/Game\\.ts|interfaces\\/Review\\.ts|interfaces\\/User\\.ts|interfaces\\/UserData\\.ts|middleware\\/authMiddleware\\.ts|middleware\\/errorMiddleware\\.ts|ml\\/embeddingService\\.ts|models\\/GameModel\\.ts|models\\/ReviewModel\\.ts|models\\/UserDataModel\\.ts|models\\/UserModel\\.ts|routes\\/reviewRoutes\\.ts|services\\/recommendationService\\.ts|tests\\/auth\\.google\\.test\\.ts|tests\\/auth\\.test\\.ts|tests\\/game\\.test\\.ts|tests\\/ml\\.embeddingService\\.test\\.ts|tests\\/review\\.test\\.ts|tests\\/scripts\\/setupTests\\.ts|tests\\/user\\.user_data\\.test\\.ts|utils\\/auth\\.ts)"
+    },
+    "opts": {
+      "destination": "./docs",
+      "recurse": true,
+      "template": "default"
+    }
+  }
+  

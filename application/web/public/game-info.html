@@ -2,82 +2,69 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Review - Rate My Video Game</title>
-    <!-- Main CSS file for general styling -->
-    <link rel="stylesheet" href="styles.css">
-    <!-- Additional CSS for game info page -->
-    <link rel="stylesheet" href="game-info.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Review - Rate My Video Game</title>
+  <!-- Main CSS file for general styling -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Additional CSS for game info page -->
+  <link rel="stylesheet" href="game-info.css">
 </head>
 
 <body>
-    <!-- Header Section -->
-    <header class="banner">
-        <div class="banner-picture"></div>
-        <div class="banner-content">
-            <h1 class="title">
-                <a href="index.html" class="title-link">Rate My Video Game</a>
-            </h1>
-            <div class="buttons">
-                <button class="pill-button">Sign Up</button>
-                <button class="pill-button">Login</button>
-            </div>
+  <!-- Header Section -->
+  <header class="banner">
+    <div class="banner-picture"></div>
+    <div class="banner-content">
+      <h1 class="title">
+        <a href="index.html" class="title-link">Rate My Video Game</a>
+      </h1>
+      <div class="buttons">
+        <button class="pill-button">Sign Up</button>
+        <button class="pill-button">Login</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Section -->
+  <section class="content-section">
+    <!-- Game Information Section -->
+    <div class="game-info">
+      <div class="info-top">
+        <div class="game-stats">
+          <h1 id="game-title">Loading...</h1>
+          <p id="game-rating">Loading...</p>
+          <p id="game-release-date">Loading...</p>
         </div>
-    </header>
-
-    <!-- Main Content Section -->
-    <section class="content-section">
-        <!-- Game Information Section -->
-        <div class="game-info">
-            <div class="info-top">
-                <div class="game-stats">
-                    <h1 id="game-title">Loading...</h1>
-                    <p id="game-rating">Loading...</p>
-                    <p id="game-release-date">Loading...</p>
-                </div>
-                <div class="game-image">
-                    <img src="gameinfo_testimage.png" alt="Game Image">
-                </div>
-            </div>
-            <div class="info-bottom">
-                <p>Platforms:</p>
-                <p>Nintendo</p>
-                <p> | </p>
-                <p>Atari</p>
-                <p> | </p>
-                <p>Sega</p>
-                <p> | </p>
-                <p>Playstation</p>
-                <p> | </p>
-                <p><a id="post-review-link" href="http://127.0.0.1:8000/game-review.html">Post A Review</a></p>
-            </div>
+        <div class="game-image">
+          <img src="gameinfo_testimage.png" alt="Game Image">
         </div>
+      </div>
+      <div class="info-bottom">
+        <p>Platforms:</p>
+        <p>Nintendo</p>
+        <p> | </p>
+        <p>Atari</p>
+        <p> | </p>
+        <p>Sega</p>
+        <p> | </p>
+        <p>Playstation</p>
+        <p> | </p>
+        <p><a id="post-review-link" href="http://127.0.0.1:8000/game-review.html">Post A Review</a></p>
+      </div>
+    </div>
 
-        <!-- Game Reviews Section -->
-        <div class="game-reviews">
-            <h3>Game Reviews</h3>
-            <!-- "Create Review" Button -->
-            <!-- <button id="create-review-btn" class="pill-button">Create Review</button> -->
+    <!-- Game Reviews Section -->
+    <div class="game-reviews">
+      <h3>Game Reviews</h3>
+      <!-- Container for dynamically added reviews -->
+      <div id="reviews-container"></div>
+    </div>
+  </section>
 
-            <!-- Review Form (Initially Hidden) -->
-            <form id="create-review-form" class="hidden">
-                <label for="rating">Rating:</label>
-                <input type="number" id="rating" name="rating" min="1" max="5" required>
-                <label for="review_text">Review:</label>
-                <textarea id="review_text" name="review_text" rows="4" required></textarea>
-                <button type="submit" class="submit-btn">Submit Review</button>
-            </form>
-
-            <!-- Container for dynamically added reviews -->
-            <div id="reviews-container"></div>
-        </div>
-    </section>
-
-    <!-- Scripts -->
-    <script src="script.js"></script>
-    <script src="game-info.js"></script>
+  <!-- Scripts -->
+  <script src="script.js"></script>
+  <script src="game-info.js"></script>
 </body>
 
 </html>
-

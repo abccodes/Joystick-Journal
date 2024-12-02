@@ -9,7 +9,7 @@ import {
   closeDatabase,
 } from './scripts/setupTests';
 
-let pool = getPool();
+const pool = getPool();
 
 /**
  * Helper function to generate a mock JWT token for testing
