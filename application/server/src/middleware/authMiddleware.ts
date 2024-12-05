@@ -9,7 +9,6 @@ const authenticate = async (
   next: NextFunction
 ) => {
   const token = req.cookies.jwt;
-
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized: No token provided' });
   }

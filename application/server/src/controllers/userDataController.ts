@@ -5,6 +5,7 @@ import { getGameRecommendations } from '../services/recommendationService';
 import { RowDataPacket } from 'mysql2';
 import { getPool } from '../connections/database';
 import { verifyOwnership } from './helper/auth';
+import { User as UserInterface } from '../interfaces/User';
 
 const userDataModel = new UserDataModel();
 
@@ -13,11 +14,11 @@ export const getUserDataById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.params;
-    const userId = Number(id);
-    if (!verifyOwnership(req, res, userId)) return;
+    const user = req.user as UserInterface;
+    const id = user.id;
+    if (!verifyOwnership(req, res, id)) return;
 
-    const userData = await userDataModel.getUserDataById(userId);
+    const userData = await userDataModel.getUserDataById(id);
     if (!userData) {
       res.status(404).json({ message: 'User data not found' });
     } else {
@@ -34,12 +35,12 @@ export const updateUserData = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.params;
-    const userId = Number(id);
-    if (!verifyOwnership(req, res, userId)) return;
+    const user = req.user as UserInterface;
+    const id = user.id;
+    if (!verifyOwnership(req, res, id)) return;
 
     const updates: Partial<UserDataInterface> = req.body;
-    await userDataModel.updateUserData(userId, updates);
+    await userDataModel.updateUserData(id, updates);
     res.status(200).json({ message: 'User data updated successfully' });
   } catch (error) {
     console.error('Error updating user data:', error);
@@ -53,21 +54,21 @@ export const getRecommendations = async (
 ): Promise<Response | void> => {
   try {
     const pool = getPool();
-    const { id } = req.params;
-    const userId = Number(id);
+    const user = req.user as UserInterface;
+    const id = user.id;
 
-    if (!verifyOwnership(req, res, userId)) return;
+    if (!verifyOwnership(req, res, id)) return;
 
     const [userData] = await pool.query<RowDataPacket[]>(
       'SELECT * FROM user_data WHERE id = ?',
-      [userId]
+      [id]
     );
 
     if (!userData.length) {
       throw new Error('User data not found');
     }
 
-    const recommendations = await getGameRecommendations(userId);
+    const recommendations = await getGameRecommendations(id);
     res.status(200).json(recommendations);
   } catch (error) {
     console.error('Error fetching recommendations:', error);

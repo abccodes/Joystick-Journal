@@ -1,74 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>View Profile</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <!-- Header Section -->
     <header class="banner">
-        <div class="banner-picture"></div>
-        <div class="banner-content">
-            <!-- Make the title clickable -->
-            <h1 class="title">
-                <a href="index.html" class="title-link">Rate My Video Game</a>
-            </h1>
-            <div class="buttons">
-                <a href="#" class="pill-button" id="logout-btn" style="display: none;">Logout</a>
-                <a href="view-profile.html" class="pill-button" id="settings-btn" style="display: none;">Settings</a>
-            </div>
+      <div class="banner-picture"></div>
+      <div class="banner-content">
+        <!-- Make the title clickable -->
+        <h1 class="title">
+          <a href="index.html" class="title-link">Rate My Video Game</a>
+        </h1>
+        <div class="buttons">
+          <a href="#" class="pill-button" id="logout-btn" style="display: none;"
+            >Logout</a
+          >
         </div>
+      </div>
     </header>
 
     <section class="content-section">
-        <!-- Profile Picture Bubble with File Input -->
-        <label for="profilePicUpload" class="profile-picture-container">
-            <img src="Default-Profile-Picture.jpg" alt="Profile Picture" class="profile-picture" id="profilePic">
-            <input type="file" id="profilePicUpload" name="profilePic" accept="image/*" style="display: none;">
-        </label>
+      <!-- Profile Picture Bubble with File Input -->
+      <label for="profilePicUpload" class="profile-picture-container">
+        <img
+          src="Default-Profile-Picture.jpg"
+          alt="Profile Picture"
+          class="profile-picture"
+          id="profilePic"
+        />
+        <input
+          type="file"
+          id="profilePicUpload"
+          name="profilePic"
+          accept="image/*"
+          style="display: none;"
+        />
+      </label>
 
-        <div class="profile-container">
-            <div class="header">
-                <h1>Welcome Back, <span id="username">User</span>!</h1>
-                <button class="edit-profile-button">Edit Profile</button>
-            </div>
-            <div class="tabs">
-                <button class="tab active">Profile</button>
-                <button class="tab">Settings</button>
-            </div>
-
-            <div class="profile-content">
-                <div class="profile-section">
-                    <h2>Username:</h2>
-                    <p id="user-username">user123</p>
-                </div>
-                <div class="profile-section">
-                    <h2>Email:</h2>
-                    <p id="user-email">user@example.com</p>
-                </div>
-                <div class="profile-section">
-                    <h2>Member Since:</h2>
-                    <p id="user-member-since">January 2023</p>
-                </div>
-            </div>
+      <div class="profile-container">
+        <div class="header">
+          <h1>Welcome Back, <span id="username">User</span>!</h1>
+          <button class="edit-profile-button">Edit Profile</button>
+        </div>
+        <div class="tabs">
+          <button class="tab active">Profile</button>
+          <button class="tab">Settings</button>
         </div>
 
-        <div class="reviews-section">
-            <h2>Reviews</h2>
-            <!-- Add review content here -->
+        <div class="profile-content">
+          <div class="profile-section">
+            <h2>Username:</h2>
+            <p id="user-username">user123</p>
+          </div>
+          <div class="profile-section">
+            <h2>Email:</h2>
+            <p id="user-email">user@example.com</p>
+          </div>
+          <div class="profile-section">
+            <h2>Member Since:</h2>
+            <p id="user-member-since">January 2023</p>
+          </div>
         </div>
+      </div>
+
+      <div class="reviews-section">
+        <h2>Reviews</h2>
+        <!-- Add review content here -->
+      </div>
     </section>
 
     <footer>
-        <ul class="footer-links">
-            <li><a href="#">Ad Choices</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-        </ul>
+      <ul class="footer-links">
+        <li><a href="#">Ad Choices</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
     </footer>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

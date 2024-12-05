@@ -1,17 +1,6 @@
 let userId = null; // Global variable to store the logged-in user's ID
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // DOM Elements
-  // const searchTerm = 'f';
-  // const response = await fetch(
-  //   `http://127.0.0.1:8000/api/games/search?query=${encodeURIComponent(
-  //     searchTerm
-  //   )}`,
-  //   { credentials: 'include' }
-  // );
-
-  // console.log('Response:', response);
-
   const logoutButton = document.getElementById('logout-btn');
   const signupButton = document.querySelector('a[href="signup.html"]');
   const loginButton = document.querySelector('a[href="login.html"]');
@@ -297,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (searchTerm) {
         try {
           const response = await fetch(
-            `http://localhost:8000/api/games/search?query=${encodeURIComponent(
+            `http://127.0.0.1:8000/api/games/search?query=${encodeURIComponent(
               searchTerm
             )}`,
             {

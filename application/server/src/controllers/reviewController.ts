@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import ReviewModel from '../models/ReviewModel';
 import { verifyOwnership } from './helper/auth';
+import { User as UserInterface } from '../interfaces/User';
 
 const reviewModel = new ReviewModel();
 
@@ -9,7 +10,8 @@ export const createReview = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const { id } = req.params;
+    const user = req.user as UserInterface;
+    const id = user.id;
 
     if (!id) {
       return res
@@ -44,7 +46,8 @@ export const getReviewById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.params;
+    const user = req.user as UserInterface;
+    const id = user.id;
     const review = await reviewModel.getReviewById(Number(id));
 
     if (!review) {
@@ -79,7 +82,8 @@ export const getReviewByGameId = async (
 
 export const updateReview = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const user = req.user as UserInterface;
+    const id = user.id;
     const reviewId = Number(id);
 
     const review = await reviewModel.getReviewById(reviewId);
@@ -100,7 +104,8 @@ export const updateReview = async (req: Request, res: Response) => {
 
 export const deleteReview = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const user = req.user as UserInterface;
+    const id = user.id;
     const reviewId = Number(id);
 
     const review = await reviewModel.getReviewById(reviewId);
