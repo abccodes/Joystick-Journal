@@ -86,16 +86,16 @@ INSERT INTO users (name, email, password, profile_pic, theme_preference, user_da
     ('Jack White', 'jack.white@example.com', 'password10', '/uploads/profiles/jack.jpg', 'dark', 10);
 
 INSERT INTO games (title, description, genre, tags, platforms, playtime_estimate, developer, publisher, game_mode, release_date, review_rating, cover_image) VALUES
-    ('Fortnite', 'Battle royale shooter', 'Shooter', '["battle-royale"]', '["PC", "PlayStation", "Xbox"]', 50, 'Epic Games', 'Epic Games', 'multiplayer', '2018-03-12', 8, '/assets/images/fortnite.jpg'),
-    ('FIFA 21', 'Soccer simulation game', 'Sports', '["sports", "simulation"]', '["PC", "PlayStation", "Xbox"]', 40, 'EA Sports', 'Electronic Arts', 'multiplayer', '2020-10-06', 7, '/assets/images/fifa21.jpg'),
-    ('Minecraft', 'Open-world sandbox', 'Sandbox', '["sandbox", "creative"]', '["PC", "PlayStation", "Xbox", "Mobile"]', 1000, 'Mojang Studios', 'Mojang Studios', 'both', '2011-11-18', 9, '/assets/images/minecraft.jpg'),
-    ('The Witcher 3', 'Fantasy RPG', 'RPG', '["fantasy", "open-world"]', '["PC", "PlayStation", "Xbox"]', 150, 'CD Projekt Red', 'CD Projekt', 'single-player', '2015-05-18', 10, '/assets/images/witcher3.jpg'),
-    ('Valorant', 'Tactical shooter', 'Shooter', '["tactical", "competitive"]', '["PC"]', 50, 'Riot Games', 'Riot Games', 'multiplayer', '2020-06-02', 9, '/assets/images/valorant.jpg'),
-    ('Apex Legends', 'Battle royale with characters', 'Shooter', '["battle-royale", "character-based"]', '["PC", "PlayStation", "Xbox"]', 30, 'Respawn Entertainment', 'Electronic Arts', 'multiplayer', '2019-02-04', 9, '/assets/images/apex_legends.jpg'),
-    ('League of Legends', 'Popular MOBA', 'Strategy', '["MOBA", "competitive"]', '["PC"]', 200, 'Riot Games', 'Riot Games', 'multiplayer', '2009-10-27', 8, '/assets/images/lol.jpg'),
-    ('Overwatch', 'Team-based shooter', 'Shooter', '["team-based", "competitive"]', '["PC", "PlayStation", "Xbox"]', 40, 'Blizzard', 'Blizzard', 'multiplayer', '2016-05-24', 9, '/assets/images/overwatch.jpg'),
-    ('Cyberpunk 2077', 'Futuristic RPG', 'RPG', '["open-world", "sci-fi"]', '["PC", "PlayStation", "Xbox"]', 100, 'CD Projekt Red', 'CD Projekt', 'single-player', '2020-12-10', 7, '/assets/images/cyberpunk.jpg'),
-    ('Stardew Valley', 'Farming simulation', 'Simulation', '["farming", "life-simulation"]', '["PC", "PlayStation", "Xbox", "Mobile"]', 60, 'ConcernedApe', 'ConcernedApe', 'single-player', '2016-02-26', 9, '/assets/images/stardew.jpg');
+    ('Fortnite', 'Battle royale shooter', 'Shooter', '["battle-royale"]', '["PC", "PlayStation", "Xbox"]', 50, 'Epic Games', 'Epic Games', 'multiplayer', '2018-03-12', 8, 'https://picsum.photos/200/300'),
+    ('FIFA 21', 'Soccer simulation game', 'Sports', '["sports", "simulation"]', '["PC", "PlayStation", "Xbox"]', 40, 'EA Sports', 'Electronic Arts', 'multiplayer', '2020-10-06', 7, 'https://picsum.photos/200/300'),
+    ('Minecraft', 'Open-world sandbox', 'Sandbox', '["sandbox", "creative"]', '["PC", "PlayStation", "Xbox", "Mobile"]', 1000, 'Mojang Studios', 'Mojang Studios', 'both', '2011-11-18', 9, 'https://picsum.photos/200/300'),
+    ('The Witcher 3', 'Fantasy RPG', 'RPG', '["fantasy", "open-world"]', '["PC", "PlayStation", "Xbox"]', 150, 'CD Projekt Red', 'CD Projekt', 'single-player', '2015-05-18', 10, 'https://picsum.photos/200/300'),
+    ('Valorant', 'Tactical shooter', 'Shooter', '["tactical", "competitive"]', '["PC"]', 50, 'Riot Games', 'Riot Games', 'multiplayer', '2020-06-02', 9, 'https://picsum.photos/200/300'),
+    ('Apex Legends', 'Battle royale with characters', 'Shooter', '["battle-royale", "character-based"]', '["PC", "PlayStation", "Xbox"]', 30, 'Respawn Entertainment', 'Electronic Arts', 'multiplayer', '2019-02-04', 9, 'https://picsum.photos/200/300'),
+    ('League of Legends', 'Popular MOBA', 'Strategy', '["MOBA", "competitive"]', '["PC"]', 200, 'Riot Games', 'Riot Games', 'multiplayer', '2009-10-27', 8, 'https://picsum.photos/200/300'),
+    ('Overwatch', 'Team-based shooter', 'Shooter', '["team-based", "competitive"]', '["PC", "PlayStation", "Xbox"]', 40, 'Blizzard', 'Blizzard', 'multiplayer', '2016-05-24', 9, 'https://picsum.photos/200/300'),
+    ('Cyberpunk 2077', 'Futuristic RPG', 'RPG', '["open-world", "sci-fi"]', '["PC", "PlayStation", "Xbox"]', 100, 'CD Projekt Red', 'CD Projekt', 'single-player', '2020-12-10', 7, 'https://picsum.photos/200/300'),
+    ('Stardew Valley', 'Farming simulation', 'Simulation', '["farming", "life-simulation"]', '["PC", "PlayStation", "Xbox", "Mobile"]', 60, 'ConcernedApe', 'ConcernedApe', 'single-player', '2016-02-26', 9, 'https://picsum.photos/200/300');
 
 INSERT INTO reviews (user_id, game_id, rating, review_text) VALUES
     (1, 1, 5, 'Amazing battle royale game!'),
