@@ -305,14 +305,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
           );
 
+          const games = await response.json();
           if (!response.ok) throw new Error('Network response was not ok');
 
-          const games = await response.json();
+          console.log(games);
+
           gameGrid.innerHTML = '';
+
           games.forEach(game => {
             const gameTile = document.createElement('div');
             gameTile.className = 'game-tile';
             gameTile.textContent = game.title;
+
+            const gameImage = document.createElement('img');
+            gameImage.src = game.cover_image
+              ? game.cover_image
+              : 'gameinfo_testimage.png';
+            gameImage.alt = game.title;
+            gameTile.appendChild(gameImage);
+
+            gameTile.addEventListener('click', () => {
+              window.location.href = `game-info.html?gameId=${game.game_id}`;
+            });
+
             gameGrid.appendChild(gameTile);
           });
         } catch (error) {
