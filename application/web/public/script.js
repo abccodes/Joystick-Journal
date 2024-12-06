@@ -299,6 +299,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           console.log(games);
 
+          
           gameGrid.innerHTML = '';
 
           games.forEach(game => {
@@ -312,11 +313,13 @@ document.addEventListener('DOMContentLoaded', async () => {
               : 'gameinfo_testimage.png';
             gameImage.alt = game.title;
             gameTile.appendChild(gameImage);
+            gameImage.src = game.cover_image ? game.cover_image : 'gameinfo_testimage.png';
+            gameImage.alt = game.title;
+            gameTile.appendChild(gameImage);
 
             gameTile.addEventListener('click', () => {
               window.location.href = `game-info.html?gameId=${game.game_id}`;
             });
-
             gameGrid.appendChild(gameTile);
           });
         } catch (error) {

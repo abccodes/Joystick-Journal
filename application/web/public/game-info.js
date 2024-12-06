@@ -71,6 +71,49 @@ document.addEventListener('DOMContentLoaded', async () => {
           // Append the review element to the container
           reviewsContainer.appendChild(reviewElement);
         });
+     const postReviewLink = document.getElementById('post-review-link');
+      if (postReviewLink) {
+          postReviewLink.href = `http://127.0.0.1:8000/game-review.html?gameId=${gameId}`;
+      }
+
+      //Fetching reviews for the specific game
+      try {
+          // Fetch reviews for the specific game
+          const reviewsResponse = await fetch(`http://127.0.0.1:8000/api/reviews/game/${gameId}`);
+          const reviewsData = await reviewsResponse.json();
+  
+          // Check if the reviews data is fetched
+          if (reviewsData) {
+          console.log('I have the data:', reviewsData);
+          
+          // Turning the reviewsData object into an array to loop through:
+          const reviewsArray = Array.isArray(reviewsData) ? reviewsData : [reviewsData];
+  
+          // Get the reviews container to display reviews
+          const reviewsContainer = document.querySelector('.game-reviews');
+          reviewsContainer.innerHTML = ''; // Clear any existing content
+  
+          // Loop through the reviews and display them
+          reviewsArray.forEach(review => {
+            const reviewElement = document.createElement('div');
+            
+            // Add a class to the review element for styling
+            reviewElement.classList.add('review-box'); 
+            
+            // Construct a string to display all the properties of the review
+            reviewElement.innerHTML = `
+                <strong>Review ID:</strong> ${review.review_id} <br>
+                <strong>User ID:</strong> ${review.user_id} <br>
+                <strong>Rating:</strong> ${review.rating} <br>
+                <strong>Review Text:</strong> ${review.review_text} <br>
+                <strong>Created At:</strong> ${review.created_at} <br>
+                <strong>Updated At:</strong> ${review.updated_at} <br>
+            `;
+            
+            // Append the review element to the container
+            reviewsContainer.appendChild(reviewElement);
+          });
+                    
       } else {
         console.log('No reviews data found.');
       }

@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "@types/multer": "^1.4.12",
+    "nodemon": "^3.1.7"
+  },
+  "name": "csc648-01-fa24-team02",
+  "version": "1.0.0",
+  "description": "**Application URL: <https://csc648-01-fa24-team02.vercel.app/>**",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "start": "node src/index.js",
+    "db": "mysql.server start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
