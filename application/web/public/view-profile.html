@@ -24,22 +24,30 @@
     </header>
 
     <section class="content-section">
-      <!-- Profile Picture Bubble with File Input -->
-      <label for="profilePicUpload" class="profile-picture-container">
-        <img
-          src="Default-Profile-Picture.jpg"
-          alt="Profile Picture"
-          class="profile-picture"
-          id="profilePic"
-        />
-        <input
-          type="file"
-          id="profilePicUpload"
-          name="profilePic"
-          accept="image/*"
-          style="display: none;"
-        />
-      </label>
+        <!-- Profile Picture Bubble with File Input -->
+        <form 
+        action="/upload-endpoint"
+        method="POST" 
+        enctype="multipart/form-data"
+        class="profile-picture-form"
+      >
+        <label for="profilePicUpload" class="profile-picture-container">
+          <img 
+            src="Default-Profile-Picture.jpg" 
+            alt="Profile Picture" 
+            class="profile-picture" 
+            id="profilePic"
+          />
+          <input 
+            type="file" 
+            id="profilePicUpload" 
+            name="profilePic" 
+            accept="image/*" 
+            style="display: none;"
+          />
+        </label>
+      </form>
+      
 
       <div class="profile-container">
         <div class="header">

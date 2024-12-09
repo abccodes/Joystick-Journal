@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { User as UserInterface } from '../interfaces/User';
 import User from '../models/UserModel';
+import path from 'path';
+import { S3Client, PutObjectCommand, PutObjectCommandInput} from '@aws-sdk/client-s3';
+
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -22,7 +25,7 @@ export const getUser = async (req: Request, res: Response) => {
       id: fullUserData.id,
       name: fullUserData.name,
       email: fullUserData.email,
-      profile_pic: fullUserData.profile_pic,
+      profile_pic: `https://${process.env.BUCKET_NAME}.s3.${process.env.BUCKET_REGION}.amazonaws.com/${fullUserData.profile_pic}`,
       theme_preference: fullUserData.theme_preference,
       user_data_id: fullUserData.user_data_id,
       created_at: fullUserData.created_at,
@@ -89,49 +92,57 @@ export const getUserByUserName = async (req: Request, res: Response) => {
   }
 };
 
+// Initialize S3 client with credentials from environment variables
+const s3 = new S3Client({
+  region: process.env.BUCKET_REGION!,
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY!,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+  },
+});
+
 export const updateUserProfilePicture = async (req: Request, res: Response) => {
   try {
     const user = req.user as UserInterface;
-    const id = user.id;
-
-    if (!id) {
-      return res.status(401).json({
-        message: 'Unauthorized: Please sign in to update profile picture',
-      });
+    if (!user || !user.id) {
+      console.error('User not authenticated');
+      return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const userId = req.body.userId;
     const file = req.file;
-
-    if (!id !== userId) {
-      return res
-        .status(401)
-        .json({ message: 'Unauthorized: Not your profile' });
-    }
-
     if (!file) {
+      console.error('No file uploaded');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Generate a mock URL for now (later this will be replaced with an actual AWS S3 URL)
-    const imageUrl = `http://localhost:3000/uploads/${file.filename}`;
+    const fileName = `${Date.now()}-${path.basename(file.originalname)}`;
+    console.log('Uploading file:', fileName);
 
-    // Use the User model to update the user's profile picture URL in the database
-    const updateSuccessful = await User.updateUserProfilePicture(
-      userId,
-      imageUrl
-    );
+    const params = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
+    await s3.send(new PutObjectCommand(params));
+    
 
-    if (!updateSuccessful) {
-      return res.status(404).json({ error: 'User not found' });
+    try {
+      await s3.send(new PutObjectCommand(params));
+      console.log('File uploaded to S3:', fileName);
+    } catch (err) {
+      console.error('S3 upload failed:', err);
+      throw new Error('S3 upload error');
     }
 
-    res.json({
+    await User.updateUserProfilePicture(user.id, fileName);
+
+    return res.json({
       message: 'Profile picture uploaded successfully!',
-      imageUrl,
+      imageUrl: `https://${process.env.BUCKET_NAME}.s3.${process.env.BUCKET_REGION}.amazonaws.com/${fileName}`,
     });
   } catch (error) {
     console.error('Error updating profile picture:', error);
-    res.status(500).json({ error: 'Failed to upload profile picture.' });
+    return res.status(500).json({ error: 'Failed to upload profile picture.' });
   }
 };
