@@ -9,7 +9,6 @@ Joystick Journal stands out from competitors with its tailored recommendations, 
 ## Screenshots
 
 ![Backend Diagram](diagrams/joystickjournal.drawio.png)
-![Home](diagrams/home.png)
 
 ## Authors
 
