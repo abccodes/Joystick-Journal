@@ -10,18 +10,6 @@ Joystick Journal stands out from competitors with its tailored recommendations, 
 
 ![Backend Diagram](diagrams/joystickjournal.drawio.png)
 
-## Authors
-
-|        Name         |         Email          | GitHub Username |      role      |
-| :-----------------: | :--------------------: | :-------------: | :------------: |
-|  Andrew Dahlstrom   |  adahlstrom@sfsu.edu   |   shoreOwl125   |  Team Leader   |
-|      Joyce Fu       |      jfu@sfsu.edu      |   fufu911219    |  Scrum Master  |
-|     Jason Avina     | javina2@mail.sfsu.edu  |   JasonAvina    |  Scrum Master  |
-|      Nadir Ali      |     nali1@sfsu.edu     |   NadirAli17    | Github Master  |
-|      Kayla Maa      |     kmaa@sfsu.edu      |    kaylamaa     | Front-end Lead |
-| Aidan Bayer-Calvert | abayercalvert@sfsu.edu |    abccodes     | Back-end Lead  |
-|    Ryan Flannery    |   rflannery@sfsu.edu   |  ryanvflannery  | Back-end Lead  |
-
 ## Run Locally
 
 Clone the project
