@@ -1,10 +1,15 @@
+import Navbar from "./components/navbar.tsx";
+
 function App() {
   return (
-    <div className="bg-pink-200 min-h-screen flex items-center justify-center">
+    <div className="bg-pink-200 min-h-screen">
+      {/* Navbar Component */}
+      <Navbar />
+
       {/* Main Content */}
-      <div className="text-center">
+      <div className="flex items-center justify-center min-h-screen">
         <h1 className="text-3xl font-bold text-gray-900">
-          Welcome to Joystick Journal
+          Search
         </h1>
       </div>
     </div>
