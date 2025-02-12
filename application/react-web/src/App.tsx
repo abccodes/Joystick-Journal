@@ -1,4 +1,6 @@
-import Navbar from "./components/navbar.tsx";
+import Navbar from "./components/Navbar.tsx";
+import Footer from "./components/Footer.tsx";
+
 
 function App() {
   return (
@@ -12,7 +14,10 @@ function App() {
           Search
         </h1>
       </div>
+      {/* Footer Sticks to the bottom of the page!*/}
+      <Footer />
     </div>
+    
   );
 }
 
