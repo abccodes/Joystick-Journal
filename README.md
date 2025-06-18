@@ -2,7 +2,7 @@
 
 # Joystick Journal
 
-Joystick Journal is an innovative video game rating and recommendation platform designed to help gamers discover, review, and evaluate games that align with their preferences. The application provides features like multi-metric 5-star game ratings, detailed reviews, and AI-powered personalized recommendations. With user account creation, gamers can bookmark favorites, track their reviews, and explore trending games across genres.
+Joystick Journal is a game rating and recommendation platform designed to help gamers discover, review, and evaluate games that align with their preferences. The application provides features like multi-metric 5-star game ratings, detailed reviews, and AI-powered personalized recommendations. With user account creation, gamers can bookmark favorites, track their reviews, and explore trending games across genres.
 
 Joystick Journal stands out from competitors with its tailored recommendations, robust user profiles, and interactive community-driven reviews. Designed by a passionate team of software engineering students, the app combines advanced technologies with user-centric design to create a seamless and engaging experience for gamers of all levels.
 
